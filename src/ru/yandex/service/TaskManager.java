@@ -90,14 +90,8 @@ public class TaskManager implements ITask, IManageable {
     @Override
     public Task removeById(Integer id) {
         if (listEpics.containsKey(id)) {
-            ArrayList<Integer> removeIdxs = new ArrayList<>();
-            for (Map.Entry<Integer, Subtask> subtask : this.getListSubTasks().entrySet()) {
-                if (subtask.getValue().getEpicId() + 1 == id)
-                    removeIdxs.add(subtask.getKey());
-            }
-            for (int idx: removeIdxs) {
-                listSubTasks.remove(idx);
-            }
+            listSubTasks.entrySet()
+                    .removeIf(entry -> entry.getValue().getEpicId() + 1 == id);
             return listEpics.remove(id);
         }
         else if (listSubTasks.containsKey(id))
