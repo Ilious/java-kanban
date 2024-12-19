@@ -14,7 +14,7 @@ public class Main {
                 tk.getIdx(), TaskStatus.NEW));
         tk.createTask(epicTask);
 
-        Subtask subtask = new Subtask(new Task(task.getLabel(), "subtask", tk.getIdx(), TaskStatus.IN_PROGRESS),
+        Subtask subtask = new Subtask(new Task(task.getLabel(), "subtask", tk.getIdx(), TaskStatus.DONE),
                 epicTask.getId());
         tk.createTask(subtask);
 
@@ -26,11 +26,23 @@ public class Main {
                 TaskStatus.NEW));
         tk.createTask(epicTask2);
         Subtask subtaskEp2 = new Subtask(new Task("send the project[hard]", "send", tk.getIdx(),
-                TaskStatus.IN_PROGRESS), epicTask2.getId());
+                TaskStatus.DONE), epicTask2.getId());
         tk.createTask(subtaskEp2);
 
-        tk.printAllTasks();
-
+        ((Epic)tk.getTaskById(3)).updateStatus();
+        ((Epic)tk.getTaskById(6)).updateStatus();
+        for (Task tempSubtask: tk.getListTasks()) {
+            System.out.println(tempSubtask);
+        }
+        System.out.println("*".repeat(30));
+        for (Epic tempSubtask: tk.getListEpics()) {
+            System.out.println(tempSubtask);
+        }
+        System.out.println("*".repeat(30));
+        for (Subtask tempSubtask: tk.getListSubTasks()) {
+            System.out.println(tempSubtask);
+        }
+        System.out.println("-".repeat(30));
         tk.getTaskById(1).updateStatus(TaskStatus.DONE);
         tk.getTaskById(2).updateStatus(TaskStatus.DONE);
 
@@ -46,10 +58,19 @@ public class Main {
         tk.getTaskById(7).updateStatus(TaskStatus.DONE);
         ((Epic) taskEPIC2).updateStatus();
 
-        tk.printAllTasks();
-
         tk.removeById(1);
         tk.removeById(3);
-        tk.printAllTasks();
+
+        for (Task tempSubtask: tk.getListTasks()) {
+            System.out.println(tempSubtask);
+        }
+        System.out.println("*".repeat(30));
+        for (Epic tempSubtask: tk.getListEpics()) {
+            System.out.println(tempSubtask);
+        }
+        System.out.println("*".repeat(30));
+        for (Subtask tempSubtask: tk.getListSubTasks()) {
+            System.out.println(tempSubtask);
+        }
     }
 }

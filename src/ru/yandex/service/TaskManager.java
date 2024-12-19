@@ -6,22 +6,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TaskManager implements ITask, IManageable {
+public class TaskManager implements ITask {
     private final HashMap<Integer, Task> listTasks = new HashMap<>();
 
     private final HashMap<Integer, Subtask> listSubTasks = new HashMap<>();
     private final HashMap<Integer, Epic> listEpics = new HashMap<>();
-    private static int idx = 0;
+    private int idx = 0;
 
-    public HashMap<Integer, Task> getListTasks() {
-        return listTasks;
+    public ArrayList<Task> getListTasks() {
+        return new ArrayList<>(listTasks.values());
     }
 
-    public HashMap<Integer, Subtask> getListSubTasks() {
-        return listSubTasks;
+    public ArrayList<Subtask> getListSubTasks() {
+        return new ArrayList<>(listSubTasks.values());
     }
-    public HashMap<Integer, Epic> getListEpics() {
-        return listEpics;
+
+    public ArrayList<Epic> getListEpics() {
+        return new ArrayList<>(listEpics.values());
     }
 
     public int getIdx() {
@@ -32,46 +33,21 @@ public class TaskManager implements ITask, IManageable {
         idx++;
     }
 
-    @Override
-    public void printAllTasks() {
-        printEpics();
-        printSubtasks();
-        printTasks();
-        System.out.println("*".repeat(30));
+    public void deleteTasks() {
+        getListTasks().clear();
     }
 
-    @Override
-    public void printSubtasks() {
-        System.out.println("TaskManager.printSubtasks");
-        for (Integer id : getListSubTasks().keySet()) {
-            System.out.printf("id = %s, getListSubTasks().get(id) = %s\n", id, getListSubTasks().get(id));
+    public void deleteSubtasks() {
+        for (Epic epic : getListEpics()) {
+            epic.getSubtasks().clear();
+            epic.updateStatus();
         }
-        System.out.println("-".repeat(30));
+        getListSubTasks().clear();
     }
 
-    @Override
-    public void printEpics() {
-        System.out.println("TaskManager.printEpics");
-        for (Integer id : getListEpics().keySet()) {
-            System.out.printf("id = %s, getListEpics().get(id) = %s\n", id, getListEpics().get(id));
-        }
-        System.out.println("-".repeat(30));
-    }
-
-    @Override
-    public void printTasks() {
-        System.out.println("TaskManager.printTasks");
-        for (Integer id : getListTasks().keySet()) {
-            System.out.printf("id = %s, getListTasks().get(id) = %s\n", id, getListTasks().get(id));
-        }
-        System.out.println("-".repeat(30));
-    }
-
-    @Override
-    public void removeAllTasks() {
-        listSubTasks.clear();
-        listEpics.clear();
-        listTasks.clear();
+    public void deleteEpics() {
+        getListEpics().clear();
+        getListSubTasks().clear();
     }
 
     @Override
@@ -93,9 +69,18 @@ public class TaskManager implements ITask, IManageable {
             listSubTasks.entrySet()
                     .removeIf(entry -> entry.getValue().getEpicId() + 1 == id);
             return listEpics.remove(id);
-        }
-        else if (listSubTasks.containsKey(id))
+        } else if (listSubTasks.containsKey(id)) {
+            int epicId = listSubTasks.get(id).getEpicId();
+            Epic epic = listEpics.get(epicId);
+
+            Subtask neededSubtask = listSubTasks.get(id);
+            ArrayList<Subtask> subtasksFromEpic = epic.getSubtasks();
+
+            subtasksFromEpic.remove(neededSubtask);
+
+            epic.updateStatus();
             return listSubTasks.remove(id);
+        }
         else if (listTasks.containsKey(id))
             return listTasks.remove(id);
 
@@ -122,21 +107,15 @@ public class TaskManager implements ITask, IManageable {
     public Task updateTask(Task task) {
         if (task instanceof Epic)
             return listEpics.put(task.getId(), new Epic(task));
-        else if (task instanceof Subtask)
-            return listSubTasks.put(this.getIdx(), new Subtask(task, ((Subtask) task).getEpicId()));
-        else
+        else if (task instanceof Subtask) {
+            listSubTasks.put(this.getIdx(), new Subtask(task, ((Subtask) task).getEpicId()));
+            for (Epic epic : getListEpics())
+                if (epic.getId() == ((Subtask) task).getEpicId())
+                    epic.updateStatus();
+
+            return task;
+        } else
             return listTasks.put(this.getIdx(), new Task(task.getDescription(), task.getLabel(), task.getId(),
                     task.getStatus()));
-    }
-
-    @Override
-    public Task getSubtasksByEpic(Epic epic) {
-        System.out.println("TaskManager.getSubtasksByEpic");
-        for (Subtask subtask: getListSubTasks().values()) {
-            if (subtask.getEpicId() == epic.getId())
-                System.out.println(subtask);
-        }
-        System.out.println("-".repeat(30));
-        return null;
     }
 }

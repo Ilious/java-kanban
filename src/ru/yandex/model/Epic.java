@@ -3,10 +3,10 @@ package ru.yandex.model;
 import java.util.ArrayList;
 
 public class Epic extends Task {
-    ArrayList<Subtask> subtasks = new ArrayList<>();
+    private ArrayList<Subtask> subtasks = new ArrayList<>();
 
     public Epic(Task task) {
-        super(task.getDescription(), task.getLabel(), task.getId(), task.getStatus());
+        super(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.NEW);
     }
 
     public Task addSubtask(Subtask task){
@@ -14,10 +14,25 @@ public class Epic extends Task {
         return task;
     }
 
-    public void updateStatus(){
-        if (subtasks.isEmpty()) super.updateStatus(TaskStatus.DONE);
+    public ArrayList<Subtask> getSubtasks() {
+        return subtasks;
+    }
 
-        boolean allDone = subtasks.stream().allMatch(subtask -> subtask.getStatus() == TaskStatus.DONE);
-        if (allDone) super.updateStatus(TaskStatus.DONE);
+    public void updateStatus(){
+        int newStat = 0;
+        for (Subtask subtask : this.getSubtasks()) {
+            if (subtask.getStatus() == TaskStatus.IN_PROGRESS) {
+                this.updateStatus(TaskStatus.IN_PROGRESS);
+                return;
+            }
+            if (subtask.getStatus() == TaskStatus.NEW) {
+                newStat++;
+            }
+        }
+        if (newStat == this.getSubtasks().size()) {
+            this.updateStatus(TaskStatus.NEW);
+        } else {
+            this.updateStatus(TaskStatus.DONE);
+        }
     }
 }
