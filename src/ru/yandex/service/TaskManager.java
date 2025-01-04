@@ -98,6 +98,7 @@ public class TaskManager implements ITask {
             listSubTasks.put((this.getIdx()), subtask);
             Epic epic = listEpics.get((subtask).getEpicId() + 1);
             epic.addSubtask(subtask);
+            epic.updateStatus();
         } else
             listTasks.put(this.getIdx(), newTask);
         return task;
