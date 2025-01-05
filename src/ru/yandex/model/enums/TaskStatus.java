@@ -1,4 +1,4 @@
-package ru.yandex.model;
+package ru.yandex.model.enums;
 
 public enum TaskStatus {
     NEW,
