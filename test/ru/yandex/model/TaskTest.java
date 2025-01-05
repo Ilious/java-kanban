@@ -18,7 +18,7 @@ class TaskTest {
     }
 
     @Test
-    void testEquals() {
+    void testEqualsTest() {
         String description = "test description";
         String label = "simple task";
         Task task = new Task(description, label, 1, TaskStatus.NEW);

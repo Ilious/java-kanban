@@ -7,12 +7,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class ManagersTest {
 
     @Test
-    void getDefault() {
+    void getDefaultTest() {
         assertNotNull(Managers.getDefault(), "ITaskManager is Null");
     }
 
     @Test
-    void getDefaultHistory() {
+    void getDefaultHistoryTest() {
         assertNotNull(Managers.getDefaultHistory(), "ITaskHistory is Null");
     }
 }

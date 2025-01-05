@@ -17,7 +17,7 @@ class SubtaskTest {
     }
 
     @Test
-    void testEquals() {
+    void testEqualsTest() {
         Task taskEpic = new Task("epic desc", "epic label", 1, TaskStatus.NEW);
         Epic epic = new Epic(taskEpic);
         taskManager.createTask(epic);
