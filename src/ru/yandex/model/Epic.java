@@ -1,5 +1,7 @@
 package ru.yandex.model;
 
+import ru.yandex.model.enums.TaskStatus;
+
 import java.util.ArrayList;
 
 public class Epic extends Task {
