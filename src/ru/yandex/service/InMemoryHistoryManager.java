@@ -12,10 +12,10 @@ public class InMemoryHistoryManager implements ITaskHistory {
     @Override
     public void addToHistory(Task task) {
         if (history.size() < 10)
-            history.add(task);
+            history.add(0, task);
         else {
-            history.remove(0);
-            history.add(task);
+            history.remove(9);
+            history.add(0, task);
         }
     }
 

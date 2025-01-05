@@ -4,6 +4,8 @@ import ru.yandex.model.interfaces.ITaskManager;
 import ru.yandex.service.InMemoryHistoryManager;
 import ru.yandex.service.InMemoryTaskManager;
 
+import java.util.Enumeration;
+
 public class Main {
     public static void main(String[] args) {
         ITaskManager tk = new InMemoryTaskManager(new InMemoryHistoryManager());
@@ -99,7 +101,7 @@ public class Main {
 
         System.out.println("История:");
         for (Task task : manager.getHistory()) {
-            System.out.println(task);
+            System.out.println(task.toString());
         }
     }
 }

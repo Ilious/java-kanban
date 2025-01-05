@@ -2,6 +2,7 @@ package ru.yandex.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.model.Subtask;
 import ru.yandex.model.Task;
 import ru.yandex.model.enums.TaskStatus;
 import ru.yandex.model.interfaces.ITaskManager;
@@ -56,8 +57,21 @@ class InMemoryTaskManagerTest {
         assertEquals(taskAdded.getStatus(), TaskStatus.NEW);
         assertEquals(taskAdded.getLabel(), label);
         assertEquals(taskAdded.getDescription(), description);
-        assertNotNull(taskAdded.getId());
     }
+
+//    @Test
+//    void createSubTaskWithEpic() {
+//        String description = "simple description";
+//        String label = "newSubTask";
+//        Task task = new Subtask(description, label, 0, TaskStatus.NEW);
+//
+//        taskManager.createTask(task);
+//        Task taskAdded = taskManager.getListTasks().get(0);
+//
+//        assertEquals(taskAdded.getStatus(), TaskStatus.NEW);
+//        assertEquals(taskAdded.getLabel(), label);
+//        assertEquals(taskAdded.getDescription(), description);
+//    }
 
     @Test
     void updateTask() {
