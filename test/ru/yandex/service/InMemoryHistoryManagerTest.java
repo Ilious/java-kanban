@@ -12,6 +12,7 @@ class InMemoryHistoryManagerTest {
 
     ITaskManager manager;
     Task task2;
+    final int MAX_SIZE = 10;
 
     @BeforeEach
     void init() {
@@ -34,11 +35,11 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void getHistoryTest() {
-        for (int i = 0; i < 11; i++) {
+        for (int i = 0; i < MAX_SIZE + 1; i++) {
             manager.getTaskById(1);
         }
         manager.getTaskById(2);
-        Task taskFromHistory = manager.getHistory().get(0);
+        Task taskFromHistory = manager.getHistory().get(MAX_SIZE - 1);
 
         assertEquals(10, manager.getHistory().size(), "there aren't 10 tasks in history");
         assertEquals(taskFromHistory.getDescription(), task2.getDescription(),
