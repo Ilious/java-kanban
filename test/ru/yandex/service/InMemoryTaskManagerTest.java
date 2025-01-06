@@ -8,6 +8,8 @@ import ru.yandex.model.Task;
 import ru.yandex.model.enums.TaskStatus;
 import ru.yandex.model.interfaces.ITaskManager;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -46,6 +48,36 @@ class InMemoryTaskManagerTest {
     @Test
     void getListEpicsTest() {
         assertEquals(1, taskManager.getListEpics().size(), "size of ListEpics is not correct");
+    }
+
+    @Test
+    void deleteTasksTest() {
+        taskManager.deleteTasks();
+        assertEquals(0, taskManager.getListTasks().size(), "deleteTasksTest is not working correct");
+    }
+
+    @Test
+    void deleteSubTasksTest() {
+        String message = "deleteTasksTest is not working correct";
+
+        taskManager.deleteSubtasks();
+        List<Epic> epics = taskManager.getListEpics();
+
+        assertEquals(0, taskManager.getListSubTasks().size(), message + "for ListSubtasks");
+        for (Epic epic :
+                epics) {
+            assertEquals(0, epic.getSubtasks().size(), message + "for ListEpics");
+        }
+    }
+
+    @Test
+    void deleteEpicsTest() {
+        String message = "deleteTasksTest is not working correct";
+
+        taskManager.deleteEpics();
+
+        assertEquals(0, taskManager.getListEpics().size(), message + " for ListEpics");
+        assertEquals(0, taskManager.getListSubTasks().size(), message + " for ListSubtasks");
     }
 
     @Test

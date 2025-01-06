@@ -4,6 +4,7 @@ import ru.yandex.model.Task;
 import ru.yandex.model.interfaces.ITaskHistory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class InMemoryHistoryManager implements ITaskHistory {
@@ -11,16 +12,14 @@ public class InMemoryHistoryManager implements ITaskHistory {
 
     @Override
     public void addToHistory(Task task) {
-        if (history.size() < 10)
-            history.add(0, task);
-        else {
-            history.remove(9);
-            history.add(0, task);
-        }
+        if (task == null) return;
+        history.add(task);
+        if (history.size() > 10)
+            history.remove(0);
     }
 
     @Override
     public List<Task> getHistory() {
-        return history;
+        return List.copyOf(history);
     }
 }

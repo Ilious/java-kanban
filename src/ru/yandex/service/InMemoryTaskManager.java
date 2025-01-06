@@ -21,22 +21,6 @@ public class InMemoryTaskManager implements ITaskManager {
         this.historyManager = historyManager;
     }
 
-    public ArrayList<Task> getListTasks() {
-        return new ArrayList<>(listTasks.values());
-    }
-
-    public ArrayList<Subtask> getListSubTasks() {
-        return new ArrayList<>(listSubTasks.values());
-    }
-
-    public ArrayList<Epic> getListEpics() {
-        return new ArrayList<>(listEpics.values());
-    }
-
-    public List<Task> getHistory() {
-        return new ArrayList<>(historyManager.getHistory());
-    }
-
     public int getIdx() {
         return idx;
     }
@@ -45,21 +29,44 @@ public class InMemoryTaskManager implements ITaskManager {
         idx++;
     }
 
-    public void deleteTasks() {
-        getListTasks().clear();
+    @Override
+    public ArrayList<Task> getListTasks() {
+        return new ArrayList<>(listTasks.values());
     }
 
+    @Override
+    public ArrayList<Subtask> getListSubTasks() {
+        return new ArrayList<>(listSubTasks.values());
+    }
+
+    @Override
+    public ArrayList<Epic> getListEpics() {
+        return new ArrayList<>(listEpics.values());
+    }
+
+    @Override
+    public List<Task> getHistory() {
+        return new ArrayList<>(historyManager.getHistory());
+    }
+
+    @Override
+    public void deleteTasks() {
+        listTasks.clear();
+    }
+
+    @Override
     public void deleteSubtasks() {
-        for (Epic epic : getListEpics()) {
+        for (Epic epic : listEpics.values()) {
             epic.getSubtasks().clear();
             epic.updateStatus();
         }
-        getListSubTasks().clear();
+        listSubTasks.clear();
     }
 
+    @Override
     public void deleteEpics() {
-        getListEpics().clear();
-        getListSubTasks().clear();
+        listEpics.clear();
+        listSubTasks.clear();
     }
 
     @Override

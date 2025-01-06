@@ -17,6 +17,9 @@ public interface ITaskManager {
     ArrayList<Task> getListTasks();
 
     List<Task> getHistory();
+    void deleteTasks();
+    void deleteSubtasks();
+    void deleteEpics();
 }
 //    a. Менеджер сам не выбирает статус для задачи. Информация о нём приходит менеджеру вместе с информацией о самой задаче. По этим данным в одних случаях он будет сохранять статус, в других будет рассчитывать.
 //        b. Для эпиков:
