@@ -1,14 +1,14 @@
 package ru.yandex.service;
 
-import ru.yandex.model.*;
+import ru.yandex.model.Epic;
+import ru.yandex.model.Subtask;
+import ru.yandex.model.Task;
 import ru.yandex.model.interfaces.ITaskHistory;
 import ru.yandex.model.interfaces.ITaskManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements ITaskManager {
     private final HashMap<Integer, Task> listTasks = new HashMap<>();
