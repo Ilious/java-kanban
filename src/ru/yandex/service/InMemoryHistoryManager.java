@@ -81,7 +81,7 @@ public class InMemoryHistoryManager implements ITaskHistory {
         Node dummy = first;
         List<Task> listTasks = new ArrayList<>();
 
-        while(dummy != null) {
+        while (dummy != null) {
             listTasks.add(dummy.value);
             dummy = dummy.next;
         }

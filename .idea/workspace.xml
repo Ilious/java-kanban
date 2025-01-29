@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d644f6ce-f83b-4ce6-87bf-dbd3b3e12ab1" name="Changes" comment="" />
+    <list default="true" id="d644f6ce-f83b-4ce6-87bf-dbd3b3e12ab1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/src/ru/yandex/model/Task.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ru/yandex/model/Task.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
