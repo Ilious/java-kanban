@@ -7,6 +7,8 @@ import ru.yandex.model.interfaces.ITaskManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements ITaskManager {
     private final HashMap<Integer, Task> listTasks = new HashMap<>();
@@ -57,7 +59,13 @@ public class InMemoryTaskManager implements ITaskManager {
     @Override
     public void deleteSubtasks() {
         for (Epic epic : listEpics.values()) {
-            epic.getSubtasks().clear();
+            List<Subtask> subtasks = epic.getSubtasks();
+
+            subtasks.stream()
+                    .map(Task::getId)
+                    .forEach(historyManager::remove);
+
+            subtasks.clear();
             epic.updateStatus();
         }
         listSubTasks.clear();
@@ -65,6 +73,16 @@ public class InMemoryTaskManager implements ITaskManager {
 
     @Override
     public void deleteEpics() {
+        listEpics.values()
+                .stream()
+                .map(Task::getId)
+                .forEach(historyManager::remove);
+
+        listSubTasks.values()
+                    .stream()
+                    .map(Task::getId)
+                    .forEach(historyManager::remove);
+
         listEpics.clear();
         listSubTasks.clear();
     }
@@ -82,7 +100,14 @@ public class InMemoryTaskManager implements ITaskManager {
 
     @Override
     public Task removeById(Integer id) {
+        historyManager.remove(id);
+
         if (listEpics.containsKey(id)) {
+            listSubTasks.values().stream()
+                    .map(Subtask::getEpicId)
+                    .filter(epicId -> epicId + 1 == id)
+                    .forEach(historyManager::remove);
+
             listSubTasks.entrySet().removeIf(entry -> entry.getValue().getEpicId() + 1 == id);
             return listEpics.remove(id);
         } else if (listSubTasks.containsKey(id)) {

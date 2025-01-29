@@ -15,9 +15,22 @@ public class InMemoryHistoryManager implements ITaskHistory {
         Node next, prev;
         Task value;
 
-        public Node(Node next, Task value) {
-            this.next = next;
+        public Node(Node prev, Task value) {
+            this.prev = prev;
             this.value = value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Node node = (Node) o;
+            return Objects.equals(value, node.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value);
         }
     }
 
@@ -25,10 +38,16 @@ public class InMemoryHistoryManager implements ITaskHistory {
     public void addToHistory(Task task) {
         if (task == null) return;
 
-        Node current = new Node(last, task);;
+        remove(task.getId());
+        Node current = new Node(last, task);
 
         if (first == null)
             first = current;
+
+        if (last == null) {
+            last = current;
+            return;
+        }
 
         last.next = current;
         last = last.next;
@@ -37,10 +56,19 @@ public class InMemoryHistoryManager implements ITaskHistory {
 
     @Override
     public void remove(int id) {
-        if (!history.containsKey(id))
+        Node node = history.remove(id);
+        if (node == null)
             return;
 
-        Node node = history.remove(id);
+        if (node.equals(first)) {
+            first = first.next;
+        }
+
+        if (node.equals(last)) {
+            last = last.prev;
+            if (last != null) last.next = null;
+            return;
+        }
 
         node.next.prev = node.prev;
         node.prev.next = node.next;
@@ -53,7 +81,7 @@ public class InMemoryHistoryManager implements ITaskHistory {
         Node dummy = first;
         List<Task> listTasks = new ArrayList<>();
 
-        while(dummy.next != null) {
+        while(dummy != null) {
             listTasks.add(dummy.value);
             dummy = dummy.next;
         }
