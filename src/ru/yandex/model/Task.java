@@ -45,7 +45,7 @@ public class Task {
     }
 
     @Override
-    public boolean equals(Object obj){
+    public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj == null || this.getClass() != obj.getClass()) return false;
 

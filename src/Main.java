@@ -23,8 +23,8 @@ public class Main {
                 epicTask.getId());
         tk.createTask(subtask);
 
-        Subtask subtask2 = new Subtask(new Task(task2.getLabel(), task2.getLabel(), 5, TaskStatus.
-                IN_PROGRESS), epicTask.getId());
+        Subtask subtask2 = new Subtask(new Task(task2.getLabel(), task2.getLabel(), 5, TaskStatus
+                .IN_PROGRESS), epicTask.getId());
         tk.createTask(subtask2);
 
         Epic epicTask2 = new Epic(new Task("pass the project", "epic task2", 6,
@@ -81,6 +81,7 @@ public class Main {
         System.out.println("&".repeat(30));
         printAllTasks(tk);
     }
+
     private static void printAllTasks(ITaskManager manager) {
         System.out.println("Задачи:");
         for (Task task : manager.getListTasks()) {

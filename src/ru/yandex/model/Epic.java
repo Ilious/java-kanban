@@ -11,7 +11,7 @@ public class Epic extends Task {
         super(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.NEW);
     }
 
-    public Task addSubtask(Subtask task){
+    public Task addSubtask(Subtask task) {
         subtasks.add(task);
         return task;
     }
@@ -20,7 +20,7 @@ public class Epic extends Task {
         return subtasks;
     }
 
-    public void updateStatus(){
+    public void updateStatus() {
         int newStat = 0;
         for (Subtask subtask : this.getSubtasks()) {
             if (subtask.getStatus() == TaskStatus.IN_PROGRESS) {
