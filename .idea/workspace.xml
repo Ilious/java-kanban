@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d644f6ce-f83b-4ce6-87bf-dbd3b3e12ab1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ru/yandex/service/InMemoryHistoryManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ru/yandex/service/InMemoryHistoryManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ru/yandex/service/InMemoryTaskManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ru/yandex/service/InMemoryTaskManager.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -157,6 +155,14 @@
           <url>file://$PROJECT_DIR$/src/Main.java</url>
           <line>66</line>
           <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/ru/yandex/service/InMemoryTaskManager.java</url>
+          <line>106</line>
+          <properties>
+            <option name="lambda-ordinal" value="0" />
+          </properties>
+          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

@@ -104,11 +104,11 @@ public class InMemoryTaskManager implements ITaskManager {
 
         if (listEpics.containsKey(id)) {
             listSubTasks.values().stream()
-                    .map(Subtask::getEpicId)
-                    .filter(epicId -> epicId + 1 == id)
+                    .filter(subtask -> subtask.getEpicId() == id)
+                    .map(Subtask::getId)
                     .forEach(historyManager::remove);
 
-            listSubTasks.entrySet().removeIf(entry -> entry.getValue().getEpicId() + 1 == id);
+            listSubTasks.entrySet().removeIf(entry -> entry.getValue().getEpicId() == id);
             return listEpics.remove(id);
         } else if (listSubTasks.containsKey(id)) {
             int epicId = listSubTasks.get(id).getEpicId();
@@ -159,6 +159,7 @@ public class InMemoryTaskManager implements ITaskManager {
 
             return task;
         } else
-            return listTasks.put(task.getId(), new Task(task.getDescription(), task.getLabel(), task.getId(), task.getStatus()));
+            return listTasks.put(task.getId(),
+                    new Task(task.getDescription(), task.getLabel(), task.getId(), task.getStatus()));
     }
 }
