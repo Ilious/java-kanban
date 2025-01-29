@@ -61,7 +61,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit5",
     "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5": "",
-    "git-widget-placeholder": "sprint__6-solution",
+    "git-widget-placeholder": "sprint__6",
     "last_opened_file_path": "C:/my programs/javaprojects/yandex/sprint_4/practice/projectTaskManager/java-kanban",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
@@ -155,11 +155,6 @@
           <url>file://$PROJECT_DIR$/src/Main.java</url>
           <line>17</line>
           <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Main.java</url>
-          <line>66</line>
-          <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/ru/yandex/service/InMemoryTaskManager.java</url>
