@@ -39,9 +39,9 @@ class InMemoryHistoryManagerTest {
             manager.getTaskById(1);
         }
         manager.getTaskById(2);
-        Task taskFromHistory = manager.getHistory().get(MAX_SIZE - 1);
+        Task taskFromHistory = manager.getHistory().get(1);
 
-        assertEquals(10, manager.getHistory().size(), "there aren't 10 tasks in history");
+        assertEquals(2, manager.getHistory().size(), "there aren't 2 tasks in history");
         assertEquals(taskFromHistory.getDescription(), task2.getDescription(),
                 "getHistory has problem in description");
         assertEquals(taskFromHistory.getLabel(), task2.getLabel(), "getHistory has problem in label");

@@ -1,6 +1,8 @@
 package ru.yandex.service;
 
-import ru.yandex.model.*;
+import ru.yandex.model.Epic;
+import ru.yandex.model.Subtask;
+import ru.yandex.model.Task;
 import ru.yandex.model.interfaces.ITaskHistory;
 import ru.yandex.model.interfaces.ITaskManager;
 
@@ -51,13 +53,21 @@ public class InMemoryTaskManager implements ITaskManager {
 
     @Override
     public void deleteTasks() {
+        listTasks.keySet()
+                .forEach(historyManager::remove);
         listTasks.clear();
     }
 
     @Override
     public void deleteSubtasks() {
         for (Epic epic : listEpics.values()) {
-            epic.getSubtasks().clear();
+            List<Subtask> subtasks = epic.getSubtasks();
+
+            subtasks.stream()
+                    .map(Task::getId)
+                    .forEach(historyManager::remove);
+
+            subtasks.clear();
             epic.updateStatus();
         }
         listSubTasks.clear();
@@ -65,6 +75,12 @@ public class InMemoryTaskManager implements ITaskManager {
 
     @Override
     public void deleteEpics() {
+        listEpics.keySet()
+                .forEach(historyManager::remove);
+
+        listSubTasks.keySet()
+                    .forEach(historyManager::remove);
+
         listEpics.clear();
         listSubTasks.clear();
     }
@@ -82,8 +98,15 @@ public class InMemoryTaskManager implements ITaskManager {
 
     @Override
     public Task removeById(Integer id) {
+        historyManager.remove(id);
+
         if (listEpics.containsKey(id)) {
-            listSubTasks.entrySet().removeIf(entry -> entry.getValue().getEpicId() + 1 == id);
+            listSubTasks.values().stream()
+                    .filter(subtask -> subtask.getEpicId() == id)
+                    .map(Subtask::getId)
+                    .forEach(historyManager::remove);
+
+            listSubTasks.entrySet().removeIf(entry -> entry.getValue().getEpicId() == id);
             return listEpics.remove(id);
         } else if (listSubTasks.containsKey(id)) {
             int epicId = listSubTasks.get(id).getEpicId();
@@ -134,6 +157,7 @@ public class InMemoryTaskManager implements ITaskManager {
 
             return task;
         } else
-            return listTasks.put(task.getId(), new Task(task.getDescription(), task.getLabel(), task.getId(), task.getStatus()));
+            return listTasks.put(task.getId(),
+                    new Task(task.getDescription(), task.getLabel(), task.getId(), task.getStatus()));
     }
 }
