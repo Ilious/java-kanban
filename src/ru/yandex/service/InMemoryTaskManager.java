@@ -53,6 +53,8 @@ public class InMemoryTaskManager implements ITaskManager {
 
     @Override
     public void deleteTasks() {
+        listTasks.keySet()
+                .forEach(historyManager::remove);
         listTasks.clear();
     }
 
@@ -73,14 +75,10 @@ public class InMemoryTaskManager implements ITaskManager {
 
     @Override
     public void deleteEpics() {
-        listEpics.values()
-                .stream()
-                .map(Task::getId)
+        listEpics.keySet()
                 .forEach(historyManager::remove);
 
-        listSubTasks.values()
-                    .stream()
-                    .map(Task::getId)
+        listSubTasks.keySet()
                     .forEach(historyManager::remove);
 
         listEpics.clear();

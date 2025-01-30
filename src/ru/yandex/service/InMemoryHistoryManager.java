@@ -12,8 +12,8 @@ public class InMemoryHistoryManager implements ITaskHistory {
 
     private static class Node {
 
-        Node next, prev;
-        Task value;
+        private Node next, prev;
+        private Task value;
 
         public Node(Node prev, Task value) {
             this.prev = prev;
