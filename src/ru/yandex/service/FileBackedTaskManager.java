@@ -16,8 +16,8 @@ import java.util.List;
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private final File file;
-    private final String PATH_TO_DATA_FILE = "data";
-    private final String NAME_OF_FILE = "tasks.txt";
+    public final String PATH_TO_DATA_FILE = "data";
+    public final String NAME_OF_FILE = "tasks.txt";
 
     public FileBackedTaskManager(ITaskHistory historyManager) {
         super(historyManager);
