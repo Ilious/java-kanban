@@ -16,12 +16,12 @@ import java.util.List;
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private final File file;
-    public final String PATH_TO_DATA_FILE = "data";
-    public final String NAME_OF_FILE = "tasks.txt";
+    public final String pathToFile = "data";
+    public final String nameOfFile = "tasks.txt";
 
     public FileBackedTaskManager(ITaskHistory historyManager) {
         super(historyManager);
-        this.file = new File(PATH_TO_DATA_FILE + File.pathSeparator + NAME_OF_FILE);
+        this.file = new File(pathToFile + File.pathSeparator + nameOfFile);
     }
 
     public FileBackedTaskManager(File file, ITaskHistory historyManager) {
