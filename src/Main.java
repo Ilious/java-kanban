@@ -3,12 +3,12 @@ import ru.yandex.model.Subtask;
 import ru.yandex.model.Task;
 import ru.yandex.model.enums.TaskStatus;
 import ru.yandex.model.interfaces.ITaskManager;
+import ru.yandex.service.FileBackedTaskManager;
 import ru.yandex.service.InMemoryHistoryManager;
-import ru.yandex.service.InMemoryTaskManager;
 
 public class Main {
     public static void main(String[] args) {
-        ITaskManager tk = new InMemoryTaskManager(new InMemoryHistoryManager());
+        FileBackedTaskManager tk = new FileBackedTaskManager(new InMemoryHistoryManager());
 
         Task task = new Task("create projectTasks", "tasks", 1, TaskStatus.NEW);
         tk.createTask(task);
@@ -80,6 +80,7 @@ public class Main {
 
         System.out.println("&".repeat(30));
         printAllTasks(tk);
+//        tk.fileUpload(new File("Tasks.csv"));
     }
 
     private static void printAllTasks(ITaskManager manager) {

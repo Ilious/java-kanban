@@ -4,7 +4,6 @@ import ru.yandex.model.Epic;
 import ru.yandex.model.Subtask;
 import ru.yandex.model.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface ITaskManager {
@@ -16,11 +15,13 @@ public interface ITaskManager {
 
     Task updateTask(Task task);
 
-    ArrayList<Subtask> getListSubTasks();
+    List<Subtask> getListSubTasks();
 
-    ArrayList<Epic> getListEpics();
+    List<Epic> getListEpics();
 
-    ArrayList<Task> getListTasks();
+    List<Task> getListTasks();
+
+    List<Task> getListAllTasks();
 
     List<Task> getHistory();
 
