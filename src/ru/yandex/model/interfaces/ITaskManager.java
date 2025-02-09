@@ -16,11 +16,13 @@ public interface ITaskManager {
 
     Task updateTask(Task task);
 
-    ArrayList<Subtask> getListSubTasks();
+    List<Subtask> getListSubTasks();
 
-    ArrayList<Epic> getListEpics();
+    List<Epic> getListEpics();
 
-    ArrayList<Task> getListTasks();
+    List<Task> getListTasks();
+
+    List<Task> getListAllTasks();
 
     List<Task> getHistory();
 
