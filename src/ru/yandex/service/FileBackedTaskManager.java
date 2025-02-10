@@ -5,6 +5,7 @@ import ru.yandex.model.Epic;
 import ru.yandex.model.Subtask;
 import ru.yandex.model.Task;
 import ru.yandex.model.enums.TaskStatus;
+import ru.yandex.model.enums.TaskType;
 import ru.yandex.model.interfaces.ITaskHistory;
 
 import java.io.*;
@@ -50,6 +51,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return task;
     }
 
+    @Override
+    public void deleteTasks() {
+        super.deleteTasks();
+        save();
+    }
+
+    @Override
+    public void deleteSubtasks() {
+        super.deleteSubtasks();
+        save();
+    }
+
+    @Override
+    public void deleteEpics() {
+        super.deleteEpics();
+        save();
+    }
+
     public static FileBackedTaskManager fileUpload(File file) {
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(Managers.getDefaultHistory());
         List<String> lines = new ArrayList<>();
@@ -78,9 +97,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private static void putTaskInList(FileBackedTaskManager taskManager, Task task) {
         int idx = taskManager.idx;
-        if (task instanceof Epic) {
+        if (task.getType() == TaskType.EPIC) {
             taskManager.listEpics.put(taskManager.idx, (Epic)task);
-        } else if (task instanceof Subtask) {
+        } else if (task.getType() == TaskType.SUBTASK) {
             taskManager.listSubTasks.put(taskManager.idx, (Subtask)task);
         } else {
             taskManager.listTasks.put(taskManager.idx, task);

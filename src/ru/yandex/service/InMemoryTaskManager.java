@@ -3,6 +3,7 @@ package ru.yandex.service;
 import ru.yandex.model.Epic;
 import ru.yandex.model.Subtask;
 import ru.yandex.model.Task;
+import ru.yandex.model.enums.TaskType;
 import ru.yandex.model.interfaces.ITaskHistory;
 import ru.yandex.model.interfaces.ITaskManager;
 
@@ -140,8 +141,8 @@ public class InMemoryTaskManager implements ITaskManager {
     public Task createTask(Task task) {
         nextIdx();
         Task newTask = new Task(task.getDescription(), task.getLabel(), task.getId(), task.getStatus());
-        if (task instanceof Epic) listEpics.put(this.getIdx(), new Epic(newTask));
-        else if (task instanceof Subtask) {
+        if (task.getType() == TaskType.EPIC) listEpics.put(this.getIdx(), new Epic(newTask));
+        else if (task.getType() == TaskType.SUBTASK) {
             Subtask subtask = new Subtask(newTask, ((Subtask) task).getEpicId());
             listSubTasks.put((this.getIdx()), subtask);
 
@@ -160,8 +161,8 @@ public class InMemoryTaskManager implements ITaskManager {
 
     @Override
     public Task updateTask(Task task) {
-        if (task instanceof Epic) return listEpics.put(task.getId(), new Epic(task));
-        else if (task instanceof Subtask) {
+        if (task.getType() == TaskType.EPIC) return listEpics.put(task.getId(), new Epic(task));
+        else if (task.getType() == TaskType.SUBTASK) {
             Subtask subtask = new Subtask(task, ((Subtask) task).getEpicId());
 
             listSubTasks.put(task.getId(), subtask);

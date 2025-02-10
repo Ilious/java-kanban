@@ -1,6 +1,7 @@
 package ru.yandex.model;
 
 import ru.yandex.model.enums.TaskStatus;
+import ru.yandex.model.enums.TaskType;
 
 import java.util.ArrayList;
 
@@ -9,6 +10,11 @@ public class Epic extends Task {
 
     public Epic(Task task) {
         super(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.NEW);
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
     }
 
     public Task addSubtask(Subtask task) {

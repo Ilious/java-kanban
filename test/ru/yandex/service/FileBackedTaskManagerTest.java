@@ -7,6 +7,7 @@ import ru.yandex.model.Epic;
 import ru.yandex.model.Subtask;
 import ru.yandex.model.Task;
 import ru.yandex.model.enums.TaskStatus;
+import ru.yandex.model.enums.TaskType;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,5 +83,51 @@ class FileBackedTaskManagerTest {
         Assertions.assertEquals(1, taskManager.getListTasks().size());
         FileBackedTaskManager fileBackedTaskManager = FileBackedTaskManager.fileUpload(file);
         Assertions.assertEquals(1, fileBackedTaskManager.getListTasks().size());
+    }
+
+    @Test
+    void removeById() {
+        taskManager.createTask(task);
+
+        Task removeById = taskManager.removeById(task.getId());
+
+        Assertions.assertEquals(removeById.getId(), task.getId());
+        Assertions.assertEquals(0, taskManager.getListAllTasks().size());
+    }
+
+    @Test
+    void deleteTasks() {
+        taskManager.createTask(task);
+
+        Task removeById = taskManager.removeById(task.getId());
+
+        Assertions.assertEquals(removeById.getId(), task.getId());
+        Assertions.assertEquals(0, taskManager.getListTasks().size());
+    }
+
+    @Test
+    void deleteSubtasks() {
+        Epic epic = new Epic(task);
+        int subtaskId = task.getId() + 1;
+        Subtask subtask = new Subtask(new Task(task.getDescription(), task.getLabel(), subtaskId,
+                task.getStatus()), epic.getId());
+        taskManager.createTask(epic);
+        taskManager.createTask(subtask);
+
+        Task removeById = taskManager.removeById(subtaskId);
+
+        Assertions.assertEquals(subtaskId, removeById.getId());
+        Assertions.assertEquals(0, taskManager.getListSubTasks().size());
+        Assertions.assertEquals(1, taskManager.getListAllTasks().size());
+    }
+
+    @Test
+    void deleteEpics() {
+        taskManager.createTask(new Epic(task));
+
+        Task removeById = taskManager.removeById(task.getId());
+
+        Assertions.assertEquals(removeById.getId(), task.getId());
+        Assertions.assertEquals(0, taskManager.getListEpics().size());
     }
 }
