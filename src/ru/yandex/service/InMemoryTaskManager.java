@@ -3,21 +3,25 @@ package ru.yandex.service;
 import ru.yandex.model.Epic;
 import ru.yandex.model.Subtask;
 import ru.yandex.model.Task;
+import ru.yandex.model.enums.TaskType;
 import ru.yandex.model.interfaces.ITaskHistory;
 import ru.yandex.model.interfaces.ITaskManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 public class InMemoryTaskManager implements ITaskManager {
-    private final HashMap<Integer, Task> listTasks = new HashMap<>();
+    protected final HashMap<Integer, Task> listTasks = new HashMap<>();
+    protected final HashMap<Integer, Subtask> listSubTasks = new HashMap<>();
+    protected final HashMap<Integer, Epic> listEpics = new HashMap<>();
+    protected final ITaskHistory historyManager;
 
-    private final HashMap<Integer, Subtask> listSubTasks = new HashMap<>();
-    private final HashMap<Integer, Epic> listEpics = new HashMap<>();
-    private final ITaskHistory historyManager;
-
-    private int idx = 0;
+    protected int idx = 0;
 
     public InMemoryTaskManager(ITaskHistory historyManager) {
         this.historyManager = historyManager;
@@ -32,18 +36,25 @@ public class InMemoryTaskManager implements ITaskManager {
     }
 
     @Override
-    public ArrayList<Task> getListTasks() {
+    public List<Task> getListTasks() {
         return new ArrayList<>(listTasks.values());
     }
 
     @Override
-    public ArrayList<Subtask> getListSubTasks() {
+    public List<Subtask> getListSubTasks() {
         return new ArrayList<>(listSubTasks.values());
     }
 
     @Override
-    public ArrayList<Epic> getListEpics() {
+    public List<Epic> getListEpics() {
         return new ArrayList<>(listEpics.values());
+    }
+
+    @Override
+    public List<Task> getListAllTasks() {
+        return Stream.of(getListSubTasks(), getListTasks(), getListEpics())
+                .flatMap(List::stream)
+                .collect(toList());
     }
 
     @Override
@@ -130,21 +141,28 @@ public class InMemoryTaskManager implements ITaskManager {
     public Task createTask(Task task) {
         nextIdx();
         Task newTask = new Task(task.getDescription(), task.getLabel(), task.getId(), task.getStatus());
-        if (task instanceof Epic) listEpics.put(this.getIdx(), new Epic(newTask));
-        else if (task instanceof Subtask) {
+        if (task.getType() == TaskType.EPIC) listEpics.put(this.getIdx(), new Epic(newTask));
+        else if (task.getType() == TaskType.SUBTASK) {
             Subtask subtask = new Subtask(newTask, ((Subtask) task).getEpicId());
             listSubTasks.put((this.getIdx()), subtask);
-            Epic epic = listEpics.get((subtask).getEpicId());
-            epic.addSubtask(subtask);
-            epic.updateStatus();
+
+            Optional<Epic> epic = getListEpics().stream()
+                    .filter(i -> i.getId() == subtask.getEpicId())
+                    .findFirst();
+
+            if (epic.isPresent()) {
+                Epic neededEpic = epic.get();
+                neededEpic.addSubtask(subtask);
+                neededEpic.updateStatus();
+            }
         } else listTasks.put(this.getIdx(), newTask);
         return task;
     }
 
     @Override
     public Task updateTask(Task task) {
-        if (task instanceof Epic) return listEpics.put(task.getId(), new Epic(task));
-        else if (task instanceof Subtask) {
+        if (task.getType() == TaskType.EPIC) return listEpics.put(task.getId(), new Epic(task));
+        else if (task.getType() == TaskType.SUBTASK) {
             Subtask subtask = new Subtask(task, ((Subtask) task).getEpicId());
 
             listSubTasks.put(task.getId(), subtask);

@@ -1,5 +1,7 @@
 package ru.yandex.model;
 
+import ru.yandex.model.enums.TaskType;
+
 import java.util.StringJoiner;
 
 public class Subtask extends Task {
@@ -12,6 +14,11 @@ public class Subtask extends Task {
 
     public int getEpicId() {
         return epicId;
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.SUBTASK;
     }
 
     @Override

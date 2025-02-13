@@ -1,6 +1,7 @@
 package ru.yandex.model;
 
 import ru.yandex.model.enums.TaskStatus;
+import ru.yandex.model.enums.TaskType;
 
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -61,6 +62,10 @@ public class Task {
                 .add("id=" + id)
                 .add("status=" + status)
                 .toString();
+    }
+
+    public TaskType getType() {
+        return TaskType.TASK;
     }
 
 }
