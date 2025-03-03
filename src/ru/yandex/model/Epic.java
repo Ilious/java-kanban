@@ -4,6 +4,7 @@ import ru.yandex.model.enums.TaskStatus;
 import ru.yandex.model.enums.TaskType;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Epic extends Task {
     private ArrayList<Subtask> subtasks = new ArrayList<>();
@@ -27,17 +28,18 @@ public class Epic extends Task {
     }
 
     public void updateStatus() {
-        int newStat = 0;
-        for (Subtask subtask : this.getSubtasks()) {
+        AtomicInteger newStat = new AtomicInteger();
+        this.getSubtasks().forEach(subtask -> {
             if (subtask.getStatus() == TaskStatus.IN_PROGRESS) {
                 this.updateStatus(TaskStatus.IN_PROGRESS);
                 return;
             }
             if (subtask.getStatus() == TaskStatus.NEW) {
-                newStat++;
+                newStat.getAndIncrement();
             }
-        }
-        if (newStat == this.getSubtasks().size()) {
+        });
+
+        if (newStat.get() == this.getSubtasks().size()) {
             this.updateStatus(TaskStatus.NEW);
         } else {
             this.updateStatus(TaskStatus.DONE);

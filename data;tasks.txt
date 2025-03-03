@@ -1,0 +1,3 @@
+7,SUBTASK,send,DONE,send the project[hard],6
+2,TASK,send,DONE,send the project[easy]
+6,EPIC,epic task2,DONE,pass the project

@@ -7,19 +7,25 @@ import ru.yandex.model.enums.TaskType;
 import ru.yandex.model.interfaces.ITaskHistory;
 import ru.yandex.model.interfaces.ITaskManager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
 public class InMemoryTaskManager implements ITaskManager {
+
     protected final HashMap<Integer, Task> listTasks = new HashMap<>();
+
     protected final HashMap<Integer, Subtask> listSubTasks = new HashMap<>();
+
     protected final HashMap<Integer, Epic> listEpics = new HashMap<>();
+
     protected final ITaskHistory historyManager;
+
+    protected TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
 
     protected int idx = 0;
 
@@ -29,6 +35,11 @@ public class InMemoryTaskManager implements ITaskManager {
 
     public int getIdx() {
         return idx;
+    }
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(prioritizedTasks);
     }
 
     public void nextIdx() {
@@ -71,7 +82,7 @@ public class InMemoryTaskManager implements ITaskManager {
 
     @Override
     public void deleteSubtasks() {
-        for (Epic epic : listEpics.values()) {
+        listEpics.values().forEach(epic -> {
             List<Subtask> subtasks = epic.getSubtasks();
 
             subtasks.stream()
@@ -80,7 +91,7 @@ public class InMemoryTaskManager implements ITaskManager {
 
             subtasks.clear();
             epic.updateStatus();
-        }
+        });
         listSubTasks.clear();
     }
 
@@ -156,11 +167,16 @@ public class InMemoryTaskManager implements ITaskManager {
                 neededEpic.updateStatus();
             }
         } else listTasks.put(this.getIdx(), newTask);
+
+        addToPriorityList(newTask);
+
         return task;
     }
 
     @Override
     public Task updateTask(Task task) {
+        addToPriorityList(task);
+
         if (task.getType() == TaskType.EPIC) return listEpics.put(task.getId(), new Epic(task));
         else if (task.getType() == TaskType.SUBTASK) {
             Subtask subtask = new Subtask(task, ((Subtask) task).getEpicId());
@@ -177,5 +193,20 @@ public class InMemoryTaskManager implements ITaskManager {
         } else
             return listTasks.put(task.getId(),
                     new Task(task.getDescription(), task.getLabel(), task.getId(), task.getStatus()));
+    }
+
+    protected void addToPriorityList(Task task) {
+        if (task.getStartTime() != null) {
+            boolean interactions = hasInteractions(task);  // TODO check validity
+
+            if (!interactions)
+                prioritizedTasks.add(task);
+        }
+    }
+
+    protected boolean hasInteractions(Task task) {
+        return prioritizedTasks.stream()
+                .anyMatch(t -> t.getStartTime().isBefore(task.getStartTime()) &&
+                        t.getEndTime().isAfter(task.getEndTime()));
     }
 }

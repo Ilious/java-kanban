@@ -84,13 +84,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             throw new FileException("Error occurred in reading file", exception);
         }
 
-        for (String line : lines) {
-            Task task = getTaskFromCsv(line);
-            if (task == null)
+        lines.forEach(line -> {
+            Task taskFromCsv = getTaskFromCsv(line);
+            if (taskFromCsv == null) {
                 throw new FileException("Error parsing file");
+            }
 
-            putTaskInList(fileBackedTaskManager, task);
-        }
+            putTaskInList(fileBackedTaskManager, taskFromCsv);
+        });
 
         return fileBackedTaskManager;
     }

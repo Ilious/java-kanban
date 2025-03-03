@@ -30,4 +30,6 @@ public interface ITaskManager {
     void deleteSubtasks();
 
     void deleteEpics();
+
+    List<Task> getPrioritizedTasks();
 }
