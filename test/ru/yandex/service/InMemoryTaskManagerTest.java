@@ -89,9 +89,9 @@ class InMemoryTaskManagerTest {
 
     @Test
     void getTaskByIdTest() {
-        Task taskById = taskManager.getTaskById(1);
-        Task epicById = taskManager.getTaskById(2);
-        Task SubtaskById = taskManager.getTaskById(3);
+        Task taskById = taskManager.getTaskById(1).get();
+        Task epicById = taskManager.getTaskById(2).get();
+        Task SubtaskById = taskManager.getTaskById(3).get();
 
         assertEquals(Task.class, taskById.getClass(),"getTask didn't work for Task");
         assertEquals(Epic.class, epicById.getClass(),"getTask didn't work for Epic");
@@ -111,7 +111,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     void createTaskTest() {
-        Task taskById = taskManager.getTaskById(1);
+        Task taskById = taskManager.getTaskById(1).get();
 
         assertEquals(task.getStatus(), taskById.getStatus());
         assertEquals(task.getLabel(), taskById.getLabel());
@@ -129,9 +129,9 @@ class InMemoryTaskManagerTest {
         taskManager.updateTask(taskEdited);
         taskManager.updateTask(subtaskEdited);
 
-        Task taskById = taskManager.getTaskById(1);
-        Task epicById = taskManager.getTaskById(2);
-        Task subtaskById = taskManager.getTaskById(3);
+        Task taskById = taskManager.getTaskById(1).get();
+        Task epicById = taskManager.getTaskById(2).get();
+        Task subtaskById = taskManager.getTaskById(3).get();
 
         assertEquals(TaskStatus.IN_PROGRESS, taskById.getStatus(),"updateTask didn't work for Task");
         assertEquals(TaskStatus.DONE, epicById.getStatus(), "updateTask didn't work for SubTask");

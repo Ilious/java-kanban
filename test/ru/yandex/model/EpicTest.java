@@ -29,7 +29,7 @@ class EpicTest {
 
     @Test
     void testEqualsTest() {
-        Task taskById = taskManager.getTaskById(1);
+        Task taskById = taskManager.getTaskById(1).get();
 
         assertEquals(1, taskById.getId(), "ids aren't equal in Epics");
         assertEquals(epic, taskById, "Epics aren't equal");

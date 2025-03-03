@@ -7,10 +7,7 @@ import ru.yandex.model.enums.TaskType;
 import ru.yandex.model.interfaces.ITaskHistory;
 import ru.yandex.model.interfaces.ITaskManager;
 
-import java.time.Instant;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -108,14 +105,14 @@ public class InMemoryTaskManager implements ITaskManager {
     }
 
     @Override
-    public Task getTaskById(Integer id) {
+    public Optional<Task> getTaskById(Integer id) {
         Task task = null;
         if (listTasks.containsKey(id)) task = listTasks.get(id);
         else if (listEpics.containsKey(id)) task = listEpics.get(id);
         else if (listSubTasks.containsKey(id)) task = listSubTasks.get(id);
 
         historyManager.addToHistory(task);
-        return task;
+        return Optional.ofNullable(task);
     }
 
     @Override
@@ -182,12 +179,15 @@ public class InMemoryTaskManager implements ITaskManager {
             Subtask subtask = new Subtask(task, ((Subtask) task).getEpicId());
 
             listSubTasks.put(task.getId(), subtask);
-            Epic epic = (Epic) getTaskById(subtask.getEpicId());
-            if (epic != null) {
-                epic.getSubtasks().removeIf(s -> s.getId() == subtask.getId());
-                epic.addSubtask(subtask);
-                epic.updateStatus();
-            }
+
+            getTaskById(subtask.getEpicId()).ifPresent(
+                    superTask -> {
+                        Epic ep = (Epic)superTask;
+                        ep.getSubtasks().removeIf(s -> s.getId() == subtask.getId());
+                        ep.addSubtask(subtask);
+                        ep.updateStatus();
+                    }
+            );
 
             return task;
         } else

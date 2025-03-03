@@ -40,9 +40,9 @@ class FileBackedTaskManagerTest {
         Assertions.assertDoesNotThrow(() -> taskManager.createTask(task2));
         Assertions.assertDoesNotThrow(() -> taskManager.createTask(task3));
 
-        Task taskById = taskManager.getTaskById(1);
-        Task taskById2 = taskManager.getTaskById(2);
-        Task taskById3 = taskManager.getTaskById(3);
+        Task taskById = taskManager.getTaskById(1).get();
+        Task taskById2 = taskManager.getTaskById(2).get();
+        Task taskById3 = taskManager.getTaskById(3).get();
 
         Assertions.assertNotNull(taskById);
         Assertions.assertNotNull(taskById2);
@@ -71,7 +71,7 @@ class FileBackedTaskManagerTest {
         taskManager.updateTask(updatedTask);
 
         Assertions.assertNotNull(taskManager.getTaskById(task.getId()));
-        Assertions.assertEquals(updatedDescription, taskManager.getTaskById(1).getDescription());
+        Assertions.assertEquals(updatedDescription, taskManager.getTaskById(1).get().getDescription());
         Assertions.assertEquals(1, taskManager.getListTasks().size());
     }
 

@@ -6,6 +6,8 @@ import ru.yandex.model.interfaces.ITaskManager;
 import ru.yandex.service.FileBackedTaskManager;
 import ru.yandex.service.InMemoryHistoryManager;
 
+import java.io.File;
+
 public class Main {
     public static void main(String[] args) {
         FileBackedTaskManager tk = new FileBackedTaskManager(new InMemoryHistoryManager());
@@ -34,25 +36,26 @@ public class Main {
                 TaskStatus.DONE), epicTask2.getId());
         tk.createTask(subtaskEp2);
 
-        ((Epic)tk.getTaskById(3)).updateStatus();
-        ((Epic)tk.getTaskById(6)).updateStatus();
+        tk.getTaskById(3).ifPresent(t -> ((Epic)t).updateStatus());
+        tk.getTaskById(6).ifPresent(t -> ((Epic)t).updateStatus());
 
         printAllTasks(tk);
 
         System.out.println("-".repeat(30));
-        tk.getTaskById(1).updateStatus(TaskStatus.DONE);
-        tk.getTaskById(2).updateStatus(TaskStatus.DONE);
+        tk.getTaskById(1).ifPresent(t -> t.updateStatus(TaskStatus.DONE));
+        tk.getTaskById(2).ifPresent(t -> t.updateStatus(TaskStatus.DONE));
 
-        Task taskEPIC = tk.getTaskById(3);
+        Task taskEPIC = tk.getTaskById(3).get();
 
         ((Epic) taskEPIC).updateStatus();
-        tk.getTaskById(4).updateStatus(TaskStatus.DONE);
-        tk.getTaskById(5).updateStatus(TaskStatus.IN_PROGRESS);
+        tk.getTaskById(4).ifPresent(t -> t.updateStatus(TaskStatus.DONE));
+        tk.getTaskById(5).ifPresent(t -> t.updateStatus(TaskStatus.IN_PROGRESS));
         ((Epic) taskEPIC).updateStatus();
 
-        Task taskEPIC2 = tk.getTaskById(6);
+        Task taskEPIC2 = tk.getTaskById(6).get();
         ((Epic) taskEPIC2).updateStatus();
-        tk.getTaskById(7).updateStatus(TaskStatus.DONE);
+        tk.getTaskById(7).ifPresent(t -> t.updateStatus(TaskStatus.DONE));
+
         ((Epic) taskEPIC2).updateStatus();
 
         tk.removeById(1);
@@ -62,7 +65,7 @@ public class Main {
 
         System.out.println("&".repeat(30));
         printAllTasks(tk);
-//        tk.fileUpload(new File("Tasks.csv"));
+        FileBackedTaskManager.fileUpload(new File("data/tasks.txt"));
     }
 
     private static void printAllTasks(ITaskManager manager) {
