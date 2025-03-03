@@ -141,14 +141,14 @@ public class InMemoryTaskManager implements ITaskManager {
             }
             return listSubTasks.remove(id);
         } else if (listTasks.containsKey(id)) return listTasks.remove(id);
-
-        else return null;
+        return null;
     }
 
     @Override
     public Task createTask(Task task) {
         nextIdx();
-        Task newTask = new Task(task.getDescription(), task.getLabel(), task.getId(), task.getStatus());
+        Task newTask = new Task(task.getDescription(), task.getLabel(), task.getId(), task.getStatus(),
+                task.getStartTime(), task.getDuration());
         if (task.getType() == TaskType.EPIC) listEpics.put(this.getIdx(), new Epic(newTask));
         else if (task.getType() == TaskType.SUBTASK) {
             Subtask subtask = new Subtask(newTask, ((Subtask) task).getEpicId());
@@ -206,7 +206,7 @@ public class InMemoryTaskManager implements ITaskManager {
 
     protected boolean hasInteractions(Task task) {
         return prioritizedTasks.stream()
-                .anyMatch(t -> t.getStartTime().isBefore(task.getStartTime()) &&
-                        t.getEndTime().isAfter(task.getEndTime()));
+                .anyMatch(t -> t.getEndTime().isAfter(task.getStartTime()) &&
+                        t.getStartTime().isBefore(task.getEndTime()));
     }
 }

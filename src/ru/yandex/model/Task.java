@@ -40,7 +40,7 @@ public class Task {
     }
 
     public Instant getEndTime() {
-        return startTime.plus(duration);
+        return startTime != null ? startTime.plus(duration) : null;
     }
 
     public Instant getStartTime() {
