@@ -19,13 +19,15 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
 
     @Override
     FileBackedTaskManager getManager() {
-        return new FileBackedTaskManager(Managers.getDefaultHistory());
+        FileBackedTaskManager backedTaskManager;
+        backedTaskManager = new FileBackedTaskManager(file, Managers.getDefaultHistory());
+        return backedTaskManager;
     }
 
     @BeforeEach
     void setUp() throws IOException {
-        manager = getManager();
         file = File.createTempFile("Data", ".csv");
+        manager = getManager();
         task = new Task("simple task for test", "simple task", 1, TaskStatus.NEW);
     }
 
