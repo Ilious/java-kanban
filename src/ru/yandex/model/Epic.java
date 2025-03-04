@@ -50,7 +50,7 @@ public class Epic extends Task {
     @Override
     public Instant getStartTime() {
         return subtasks.stream()
-                .map(Subtask::getEndTime)
+                .map(Subtask::getStartTime)
                 .filter(Objects::nonNull)
                 .min(Comparator.comparing(Instant::getEpochSecond))
                 .orElse(null);
