@@ -73,7 +73,10 @@ public class InMemoryTaskManager implements ITaskManager {
     @Override
     public void deleteTasks() {
         listTasks.keySet()
-                .forEach(historyManager::remove);
+                .forEach(t -> {
+                    prioritizedTasks.remove(listTasks.get(t));
+                    historyManager.remove(t);
+                });
         listTasks.clear();
     }
 
@@ -84,7 +87,10 @@ public class InMemoryTaskManager implements ITaskManager {
 
             subtasks.stream()
                     .map(Task::getId)
-                    .forEach(historyManager::remove);
+                    .forEach(t -> {
+                        prioritizedTasks.remove(subtasks.get(t));
+                        historyManager.remove(t);
+                    });
 
             subtasks.clear();
             epic.updateStatus();
@@ -95,10 +101,16 @@ public class InMemoryTaskManager implements ITaskManager {
     @Override
     public void deleteEpics() {
         listEpics.keySet()
-                .forEach(historyManager::remove);
+                .forEach(t -> {
+                    prioritizedTasks.remove(listEpics.get(t));
+                    historyManager.remove(t);
+                });
 
         listSubTasks.keySet()
-                    .forEach(historyManager::remove);
+                .forEach(t -> {
+                    prioritizedTasks.remove(listSubTasks.get(t));
+                    historyManager.remove(t);
+                });
 
         listEpics.clear();
         listSubTasks.clear();
@@ -126,6 +138,8 @@ public class InMemoryTaskManager implements ITaskManager {
                     .forEach(historyManager::remove);
 
             listSubTasks.entrySet().removeIf(entry -> entry.getValue().getEpicId() == id);
+            prioritizedTasks.remove(listEpics.get(id));
+
             return listEpics.remove(id);
         } else if (listSubTasks.containsKey(id)) {
             int epicId = listSubTasks.get(id).getEpicId();
@@ -139,8 +153,13 @@ public class InMemoryTaskManager implements ITaskManager {
 
                 epic.updateStatus();
             }
+            prioritizedTasks.remove(listSubTasks.get(id));
             return listSubTasks.remove(id);
-        } else if (listTasks.containsKey(id)) return listTasks.remove(id);
+        } else if (listTasks.containsKey(id)) {
+            prioritizedTasks.remove(listTasks.get(id));
+
+            return listTasks.remove(id);
+        }
         return null;
     }
 
@@ -197,7 +216,7 @@ public class InMemoryTaskManager implements ITaskManager {
 
     protected void addToPriorityList(Task task) {
         if (task.getStartTime() != null) {
-            boolean interactions = hasInteractions(task);  // TODO check validity
+            boolean interactions = hasInteractions(task);
 
             if (!interactions)
                 prioritizedTasks.add(task);
