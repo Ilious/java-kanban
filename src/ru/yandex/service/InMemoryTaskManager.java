@@ -135,7 +135,10 @@ public class InMemoryTaskManager implements ITaskManager {
             listSubTasks.values().stream()
                     .filter(subtask -> subtask.getEpicId() == id)
                     .map(Subtask::getId)
-                    .forEach(historyManager::remove);
+                    .forEach(t -> {
+                        prioritizedTasks.remove(listSubTasks.get(t));
+                        historyManager.remove(t);
+                    });
 
             listSubTasks.entrySet().removeIf(entry -> entry.getValue().getEpicId() == id);
             prioritizedTasks.remove(listEpics.get(id));
