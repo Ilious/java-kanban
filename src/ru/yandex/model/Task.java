@@ -11,7 +11,7 @@ import java.util.StringJoiner;
 public class Task {
     private final String description, label;
 
-    private final int id;
+    private int id;
 
     private TaskStatus status;
 
@@ -19,17 +19,15 @@ public class Task {
 
     private Duration duration;
 
-    public Task(String description, String label, int id, TaskStatus status) {
+    public Task(String description, String label, TaskStatus status) {
         this.description = description;
         this.label = label;
-        this.id = id;
         this.status = status;
     }
 
-    public Task(String description, String label, int id, TaskStatus status, Instant startTime, Duration duration) {
+    public Task(String description, String label, TaskStatus status, Instant startTime, Duration duration) {
         this.description = description;
         this.duration = duration;
-        this.id = id;
         this.label = label;
         this.startTime = startTime;
         this.status = status;
@@ -67,6 +65,10 @@ public class Task {
         return description;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(id);
@@ -95,4 +97,11 @@ public class Task {
         return TaskType.TASK;
     }
 
+    protected Instant setStartTime(Instant startTime) {
+        return this.startTime = startTime;
+    }
+
+    protected Duration setDuration(Duration duration) {
+        return this.duration = duration;
+    }
 }

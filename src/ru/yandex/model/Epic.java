@@ -10,14 +10,16 @@ import java.util.Comparator;
 import java.util.Objects;
 
 public class Epic extends Task {
-    private ArrayList<Subtask> subtasks = new ArrayList<>();
+    private ArrayList<Subtask> subtasks;
 
     public Epic(Task task) {
-        super(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.NEW);
+        super(task.getDescription(), task.getLabel(), TaskStatus.NEW);
+        this.subtasks = new ArrayList<>();
     }
 
-    public Epic(String description, String label, int id) {
-        super(description, label, id, TaskStatus.NEW);
+    public Epic(String description, String label) {
+        super(description, label, TaskStatus.NEW);
+        this.subtasks = new ArrayList<>();
     }
 
     @Override
@@ -32,7 +34,7 @@ public class Epic extends Task {
 
     @Override
     public Duration getDuration() {
-        return subtasks.stream()
+        return isNotValidate() ? null : subtasks.stream()
                 .map(Subtask::getDuration)
                 .filter(Objects::nonNull)
                 .reduce(Duration.ZERO, Duration::plus);
@@ -40,7 +42,7 @@ public class Epic extends Task {
 
     @Override
     public Instant getEndTime() {
-        return subtasks.stream()
+        return  isNotValidate() ? null : subtasks.stream()
                 .map(Subtask::getEndTime)
                 .filter(Objects::nonNull)
                 .max(Comparator.comparing(Instant::getEpochSecond))
@@ -49,15 +51,20 @@ public class Epic extends Task {
 
     @Override
     public Instant getStartTime() {
-        return subtasks.stream()
+        return  isNotValidate() ? null : subtasks.stream()
                 .map(Subtask::getStartTime)
                 .filter(Objects::nonNull)
                 .min(Comparator.comparing(Instant::getEpochSecond))
                 .orElse(null);
     }
 
+    public boolean isNotValidate() {
+        return subtasks == null || subtasks.isEmpty();
+    }
+
+
     public ArrayList<Subtask> getSubtasks() {
-        return subtasks;
+        return isNotValidate() ? new ArrayList<>() : subtasks;
     }
 
     public void updateStatus() {
