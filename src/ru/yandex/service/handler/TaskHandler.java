@@ -100,8 +100,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             sendNotFound(exchange);
         } catch (TaskHasInteractionsException e) {
             sendHasInteractions(exchange);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             sendText(exchange, "Internal Server error", 500);
         } finally {
             exchange.close();
