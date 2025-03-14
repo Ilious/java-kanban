@@ -1,5 +1,7 @@
-package ru.yandex.service;
+package ru.yandex.service.Tasks;
 
+import ru.yandex.exception.task.NotFoundException;
+import ru.yandex.exception.task.TaskHasInteractionsException;
 import ru.yandex.model.Epic;
 import ru.yandex.model.Subtask;
 import ru.yandex.model.Task;
@@ -117,14 +119,18 @@ public class InMemoryTaskManager implements ITaskManager {
     }
 
     @Override
-    public Optional<Task> getTaskById(Integer id) {
+    public Task getTaskById(Integer id) throws NotFoundException{
         Task task = null;
         if (listTasks.containsKey(id)) task = listTasks.get(id);
         else if (listEpics.containsKey(id)) task = listEpics.get(id);
         else if (listSubTasks.containsKey(id)) task = listSubTasks.get(id);
 
+        if (task == null) {
+            throw new NotFoundException("Task wasn't found");
+        }
+
         historyManager.addToHistory(task);
-        return Optional.ofNullable(task);
+        return task;
     }
 
     @Override
@@ -169,15 +175,24 @@ public class InMemoryTaskManager implements ITaskManager {
     @Override
     public Task createTask(Task task) {
         nextIdx();
-        Task newTask = new Task(task.getDescription(), task.getLabel(), task.getId(), task.getStatus(),
+        Task newTask = new Task(task.getDescription(), task.getLabel(), task.getStatus(),
                 task.getStartTime(), task.getDuration());
-        if (task.getType() == TaskType.EPIC) listEpics.put(this.getIdx(), new Epic(newTask));
+        newTask.setId(this.getIdx());
+        task.setId(this.getIdx());
+
+        if (task.getType() == TaskType.EPIC) {
+            Epic epic = new Epic(newTask);
+            listEpics.put(this.getIdx(), epic);
+            epic.setId(this.getIdx());
+        }
         else if (task.getType() == TaskType.SUBTASK) {
             Subtask subtask = new Subtask(newTask, ((Subtask) task).getEpicId());
+            subtask.setId(this.getIdx());
+
             listSubTasks.put((this.getIdx()), subtask);
 
             Optional<Epic> epic = getListEpics().stream()
-                    .filter(i -> i.getId() == subtask.getEpicId())
+                    .filter(i -> i.getId() == ((Subtask)task).getEpicId())
                     .findFirst();
 
             if (epic.isPresent()) {
@@ -185,7 +200,9 @@ public class InMemoryTaskManager implements ITaskManager {
                 neededEpic.addSubtask(subtask);
                 neededEpic.updateStatus();
             }
-        } else listTasks.put(this.getIdx(), newTask);
+        } else {
+            listTasks.put(this.getIdx(), newTask);
+        }
 
         addToPriorityList(newTask);
 
@@ -193,28 +210,51 @@ public class InMemoryTaskManager implements ITaskManager {
     }
 
     @Override
-    public Task updateTask(Task task) {
+    public Task updateTask(Task task, int id) {
+        task.setId(getTaskById(id).getId());
+
+        prioritizedTasks.remove(task);
+
+        if (hasInteractions(task)) {
+            throw new TaskHasInteractionsException("Task time overlaps with another task!");
+        }
+
         addToPriorityList(task);
 
-        if (task.getType() == TaskType.EPIC) return listEpics.put(task.getId(), new Epic(task));
+        Task updatedTask;
+        if (task.getType() == TaskType.EPIC) {
+            updatedTask = new Task(task.getDescription(), task.getLabel(), task.getStatus());
+            updatedTask.setId(id);
+
+            Epic epic = new Epic(updatedTask);
+            listEpics.put(task.getId(), epic);
+        }
         else if (task.getType() == TaskType.SUBTASK) {
-            Subtask subtask = new Subtask(task, ((Subtask) task).getEpicId());
+            updatedTask = new Subtask(task, ((Subtask) task).getEpicId());
+            updatedTask.setId(id);
+
+            Subtask subtask = (Subtask) updatedTask;
+            subtask.setEpicId(((Subtask)task).getEpicId());
 
             listSubTasks.put(task.getId(), subtask);
 
-            getTaskById(subtask.getEpicId()).ifPresent(
-                    superTask -> {
-                        Epic ep = (Epic)superTask;
-                        ep.getSubtasks().removeIf(s -> s.getId() == subtask.getId());
-                        ep.addSubtask(subtask);
-                        ep.updateStatus();
-                    }
-            );
+            Task epicTask = getTaskById(subtask.getEpicId());
+            if (epicTask.getType() != TaskType.EPIC) {
+                throw new TaskHasInteractionsException("EpicTask doesn't match task type");
+            }
+            Epic ep = (Epic) epicTask;
 
-            return task;
-        } else
-            return listTasks.put(task.getId(),
-                    new Task(task.getDescription(), task.getLabel(), task.getId(), task.getStatus()));
+            ep.getSubtasks().removeIf(s -> s.getId() == subtask.getId());
+            ep.addSubtask(subtask);
+            ep.updateStatus();
+
+        } else {
+            updatedTask = new Task(task.getDescription(), task.getLabel(), task.getStatus());
+            updatedTask.setId(id);
+
+            listTasks.put(task.getId(), updatedTask);
+        }
+        return updatedTask;
     }
 
     protected void addToPriorityList(Task task) {
@@ -226,7 +266,7 @@ public class InMemoryTaskManager implements ITaskManager {
         }
     }
 
-    protected boolean hasInteractions(Task task) {
+    public boolean hasInteractions(Task task) {
         return prioritizedTasks.stream()
                 .anyMatch(t -> t.getEndTime().isAfter(task.getStartTime()) &&
                         t.getStartTime().isBefore(task.getEndTime()));

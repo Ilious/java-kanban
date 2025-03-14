@@ -17,7 +17,7 @@ public class InstantAdapter extends TypeAdapter<Instant> {
             return null;
         }
 
-        return Instant.ofEpochSecond(Integer.parseInt(parseString));
+        return Instant.parse(parseString);
     }
 
     @Override
