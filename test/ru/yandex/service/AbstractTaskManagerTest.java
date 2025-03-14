@@ -9,7 +9,6 @@ import ru.yandex.model.enums.TaskStatus;
 import ru.yandex.model.interfaces.ITaskManager;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,10 +23,10 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
 
     @BeforeEach
     void setUpTasks() {
-        task = new Task("simple task description", "default Task", 1, TaskStatus.NEW);
-        epic = new Epic(new Task("simple task description", "default Epic", 2, TaskStatus.NEW));
-        subtask = new Subtask(new Task("simple task description", "default Subtask", 3, TaskStatus.NEW),
-                epic.getId());
+        task = new Task("simple task description", "default Task", TaskStatus.NEW);
+        epic = new Epic(new Task("simple task description", "default Epic", TaskStatus.NEW));
+        subtask = new Subtask(new Task("simple task description", "default Subtask", TaskStatus.NEW),
+                1);
     }
 
     @Test
@@ -86,9 +85,10 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
 
     @Test
     void getTaskById_ShouldReturnTaskTest() {
-        manager.createTask(task);
+        Task taskToCreate = new Task(task.getDescription(), "default Task", TaskStatus.NEW);
+        manager.createTask(taskToCreate);
 
-        Task taskById = manager.getTaskById(1).orElse(null);
+        Task taskById = manager.getTaskById(1);
 
         assertNotNull(taskById, "taskById should not be null");
         assertSame(Task.class, taskById.getClass(),"getTask didn't work for Task");
@@ -98,7 +98,7 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
     void getTaskById_ShouldReturnSubtaskTest() {
         manager.createTask(subtask);
 
-        Task taskById = manager.getTaskById(1).orElse(null);
+        Task taskById = manager.getTaskById(1);
 
         assertNotNull(taskById, "taskById should not be null");
         assertSame(Subtask.class, taskById.getClass(),"getTask didn't work for Subtask");
@@ -108,7 +108,7 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
     void getTaskById_ShouldReturnEpicTest() {
         manager.createTask(epic);
 
-        Task taskById = manager.getTaskById(1).orElse(null);
+        Task taskById = manager.getTaskById(1);
 
         assertNotNull(taskById, "taskById should not be null");
         assertSame(Epic.class, taskById.getClass(),"getTask didn't work for Epic");
@@ -141,7 +141,7 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
     @Test
     void createTaskTest() {
         manager.createTask(task);
-        Task taskById = manager.getTaskById(1).orElse(null);
+        Task taskById = manager.getTaskById(1);
 
         assertNotNull(taskById, "createTask didn't work for Task");
         assertEquals(task.getStatus(), taskById.getStatus());
@@ -152,7 +152,7 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
     @Test
     void createEpicTest() {
         manager.createTask(epic);
-        Task taskById = manager.getTaskById(1).orElse(null);
+        Task taskById = manager.getTaskById(1);
 
         assertNotNull(taskById);
         assertSame(Epic.class, taskById.getClass(), "createEpic didn't work for Epic");
@@ -166,12 +166,12 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
     @Test
     void createSubtaskTest() {
         manager.createTask(subtask);
-        Task taskById = manager.getTaskById(1).orElse(null);
+        Task taskById = manager.getTaskById(1);
 
         assertNotNull(taskById);
         assertSame(Subtask.class, taskById.getClass(), "createEpic didn't work for Epic");
         Subtask epicById = ((Subtask) taskById);
-        assertEquals(2, epicById.getEpicId(), "createEpic didn't work for list of subtasks");
+        assertEquals(1, epicById.getEpicId(), "createEpic didn't work for list of subtasks");
         assertEquals(subtask.getStatus(), taskById.getStatus());
         assertEquals(subtask.getLabel(), taskById.getLabel());
         assertEquals(subtask.getDescription(), taskById.getDescription());
@@ -181,11 +181,11 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
     void updateTask_TaskShouldUpdateFieldsTest() {
         manager.createTask(task);
 
-        Task taskEdited = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS);
+        Task taskEdited = new Task(task.getDescription(), task.getLabel(), TaskStatus.IN_PROGRESS);
 
-        manager.updateTask(taskEdited);
+        manager.updateTask(taskEdited, task.getId());
 
-        Task taskById = manager.getTaskById(1).orElse(null);
+        Task taskById = manager.getTaskById(task.getId());
 
         assertNotNull(taskById, "updateTask didn't work for Task");
         assertEquals(TaskStatus.IN_PROGRESS, taskById.getStatus(),"updateTask didn't work for Task");
@@ -193,14 +193,16 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
 
     @Test
     void updateTask_SubtaskShouldUpdateFieldsTest() {
+        manager.createTask(epic);
         manager.createTask(subtask);
 
         Subtask subtaskEdited = new Subtask(
-                new Task(subtask.getDescription(), subtask.getLabel(), subtask.getId(), TaskStatus.DONE),
+                new Task(subtask.getDescription(), subtask.getLabel(), TaskStatus.DONE),
                 subtask.getEpicId()
         );
-        manager.updateTask(subtaskEdited);
-        Task subtaskById = manager.getTaskById(3).orElse(null);
+
+        manager.updateTask(subtaskEdited, 2);
+        Task subtaskById = manager.getTaskById(2);
 
         assertNotNull(subtaskById, "updateTask didn't work for Task");
         assertEquals(TaskStatus.DONE, subtaskById.getStatus(), "updateTask didn't work for Epic");
@@ -212,10 +214,11 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
 
         String newLabel = epic.getLabel() + " new super label";
         Epic epicEdited = new Epic(
-                new Task(epic.getDescription(), newLabel, epic.getId(), TaskStatus.DONE)
+                new Task(epic.getDescription(), newLabel, TaskStatus.DONE)
         );
-        manager.updateTask(epicEdited);
-        Task epicById = manager.getTaskById(2).orElse(null);
+
+        manager.updateTask(epicEdited, 1);
+        Task epicById = manager.getTaskById(1);
 
         assertNotNull(epicById, "updateTask didn't work for Task");
         assertEquals(newLabel, epicById.getLabel(), "updateTask didn't work for Epic");
@@ -223,29 +226,29 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
 
     @Test
     void createSubtask_BindToEpicTest() {
-        Epic epic = new Epic("epic desc", "epic", 1);
-        Subtask subtask = new Subtask(new Task("subTask desc", "subTask", 2, TaskStatus.IN_PROGRESS), 1);
+        Epic epic = new Epic("epic desc", "epic");
+        Subtask subtask = new Subtask(new Task("subTask desc", "subTask", TaskStatus.IN_PROGRESS), 1);
 
         manager.createTask(epic);
         manager.createTask(subtask);
-        Optional<Task> taskById = manager.getTaskById(epic.getId());
+        Task taskById = manager.getTaskById(epic.getId());
 
-        assertTrue(taskById.isPresent(), "epic not found");
-        Epic epicById = (Epic) taskById.get();
+        assertNotNull(taskById, "epic not found");
+        Epic epicById = (Epic) taskById;
         assertEquals(1, epicById.getSubtasks().size(), "Wrong number of subtasks");
     }
 
     @Test
     void bindSubtasksToEpic_ShouldReturnSubtasksTest() {
-        Epic epic = new Epic("simple desc", "epic", 1);
-        Subtask subtask = new Subtask(new Task("desc for task", "name", 2, TaskStatus.NEW), epic.getId());
-        Subtask subtask2 = new Subtask(new Task("desc for task2", "name2", 3, TaskStatus.NEW), epic.getId());
-
+        Epic epic = new Epic("simple desc", "epic");
         manager.createTask(epic);
+        Subtask subtask = new Subtask(new Task("desc for task", "name", TaskStatus.NEW), epic.getId());
+        Subtask subtask2 = new Subtask(new Task("desc for task2", "name2", TaskStatus.NEW), epic.getId());
+
         manager.createTask(subtask);
         manager.createTask(subtask2);
-        Optional<Task> taskById = manager.getTaskById(1);
-        Epic epicById = (Epic) taskById.orElse(null);
+        Task taskById = manager.getTaskById(1);
+        Epic epicById = (Epic) taskById;
 
         assertNotNull(epicById, "epic not found");
         assertEquals(2, epicById.getSubtasks().size(), "Wrong number of subtasks");
@@ -253,15 +256,15 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
 
     @Test
     void calculateEpicStatus_HasInProgress_ShouldReturnInProgress() {
-        Epic epic = new Epic("simple desc", "epic", 1);
-        Subtask subtask = new Subtask(new Task("desc for task", "name", 2, TaskStatus.IN_PROGRESS), epic.getId());
-        Subtask subtask2 = new Subtask(new Task("desc for task2", "name2", 3, TaskStatus.IN_PROGRESS), epic.getId());
-
+        Epic epic = new Epic("simple desc", "epic");
         manager.createTask(epic);
+        Subtask subtask = new Subtask(new Task("desc for task", "name", TaskStatus.IN_PROGRESS), epic.getId());
+        Subtask subtask2 = new Subtask(new Task("desc for task2", "name2", TaskStatus.IN_PROGRESS), epic.getId());
+
         manager.createTask(subtask);
         manager.createTask(subtask2);
-        Optional<Task> taskById = manager.getTaskById(epic.getId());
-        Epic epicById = (Epic) taskById.orElse(null);
+        Task taskById = manager.getTaskById(epic.getId());
+        Epic epicById = (Epic) taskById;
 
         assertNotNull(epicById, "epic not found");
         assertEquals(TaskStatus.IN_PROGRESS, epicById.getStatus(), "Wrong status");
@@ -269,15 +272,15 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
 
     @Test
     void calculateEpicStatus_HasNew_ShouldReturnInProgress() {
-        Epic epic = new Epic("simple desc", "epic", 1);
-        Subtask subtask = new Subtask(new Task("desc for task", "name", 2, TaskStatus.NEW), epic.getId());
-        Subtask subtask2 = new Subtask(new Task("desc for task2", "name2", 3, TaskStatus.IN_PROGRESS), epic.getId());
-
+        Epic epic = new Epic("simple desc", "epic");
         manager.createTask(epic);
+        Subtask subtask = new Subtask(new Task("desc for task", "name", TaskStatus.NEW), epic.getId());
+        Subtask subtask2 = new Subtask(new Task("desc for task2", "name2", TaskStatus.IN_PROGRESS), epic.getId());
+
         manager.createTask(subtask);
         manager.createTask(subtask2);
-        Optional<Task> taskById = manager.getTaskById(epic.getId());
-        Epic epicById = (Epic) taskById.orElse(null);
+        Task taskById = manager.getTaskById(epic.getId());
+        Epic epicById = (Epic) taskById;
 
         assertNotNull(epicById, "epic not found");
         assertEquals(TaskStatus.IN_PROGRESS, epicById.getStatus(), "Wrong status");
@@ -285,15 +288,15 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
 
     @Test
     void calculateEpicStatus_HasAllAreDone_ShouldReturnDone() {
-        Epic epic = new Epic("simple desc", "epic", 1);
-        Subtask subtask = new Subtask(new Task("desc for task", "name", 2, TaskStatus.DONE), epic.getId());
-        Subtask subtask2 = new Subtask(new Task("desc for task2", "name2", 3, TaskStatus.DONE), epic.getId());
-
+        Epic epic = new Epic("simple desc", "epic");
         manager.createTask(epic);
+        Subtask subtask = new Subtask(new Task("desc for task", "name", TaskStatus.DONE), epic.getId());
+        Subtask subtask2 = new Subtask(new Task("desc for task2", "name2", TaskStatus.DONE), epic.getId());
+
         manager.createTask(subtask);
         manager.createTask(subtask2);
-        Optional<Task> taskById = manager.getTaskById(epic.getId());
-        Epic epicById = (Epic) taskById.orElse(null);
+        Task taskById = manager.getTaskById(1);
+        Epic epicById = (Epic) taskById;
 
         assertNotNull(epicById, "epic not found");
         assertEquals(TaskStatus.DONE, epicById.getStatus(), "Wrong status");
@@ -301,15 +304,15 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
 
     @Test
     void calculateEpicStatus_HasNotAllDone_ShouldReturnNotDone() {
-        Epic epic = new Epic("simple desc", "epic", 1);
-        Subtask subtask = new Subtask(new Task("desc for task", "name", 2, TaskStatus.NEW), epic.getId());
-        Subtask subtask2 = new Subtask(new Task("desc for task2", "name2", 3, TaskStatus.DONE), epic.getId());
-
+        Epic epic = new Epic("simple desc", "epic");
         manager.createTask(epic);
+        Subtask subtask = new Subtask(new Task("desc for task", "name", TaskStatus.NEW), epic.getId());
+        Subtask subtask2 = new Subtask(new Task("desc for task2", "name2", TaskStatus.DONE), epic.getId());
+
         manager.createTask(subtask);
         manager.createTask(subtask2);
-        Optional<Task> taskById = manager.getTaskById(epic.getId());
-        Epic epicById = (Epic) taskById.orElse(null);
+        Task taskById = manager.getTaskById(epic.getId());
+        Epic epicById = (Epic) taskById;
 
         assertNotNull(epicById, "epic not found");
         assertNotEquals(TaskStatus.DONE, epicById.getStatus(), "Wrong status");
@@ -318,15 +321,15 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
 
     @Test
     void calculateEpicStatus_HasAllDone_ShouldReturnDone() {
-        Epic epic = new Epic("simple desc", "epic", 1);
-        Subtask subtask = new Subtask(new Task("desc for task", "name", 2, TaskStatus.DONE), epic.getId());
-        Subtask subtask2 = new Subtask(new Task("desc for task2", "name2", 3, TaskStatus.DONE), epic.getId());
-
+        Epic epic = new Epic("simple desc", "epic");
         manager.createTask(epic);
+        Subtask subtask = new Subtask(new Task("desc for task", "name", TaskStatus.DONE), epic.getId());
+        Subtask subtask2 = new Subtask(new Task("desc for task2", "name2", TaskStatus.DONE), epic.getId());
+
         manager.createTask(subtask);
         manager.createTask(subtask2);
-        Optional<Task> taskById = manager.getTaskById(epic.getId());
-        Epic epicById = (Epic) taskById.orElse(null);
+        Task taskById = manager.getTaskById(epic.getId());
+        Epic epicById = (Epic) taskById;
 
         assertNotNull(epicById, "epic not found");
         assertEquals(TaskStatus.DONE, epicById.getStatus(), "Wrong status");
@@ -334,15 +337,15 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
 
     @Test
     void calculateEpicStatus_HasAllNew_ShouldReturnNew() {
-        Epic epic = new Epic("simple desc", "epic", 1);
-        Subtask subtask = new Subtask(new Task("desc for task", "name", 2, TaskStatus.NEW), epic.getId());
-        Subtask subtask2 = new Subtask(new Task("desc for task2", "name2", 3, TaskStatus.NEW), epic.getId());
-
+        Epic epic = new Epic("simple desc", "epic");
         manager.createTask(epic);
+        Subtask subtask = new Subtask(new Task("desc for task", "name", TaskStatus.NEW), epic.getId());
+        Subtask subtask2 = new Subtask(new Task("desc for task2", "name2", TaskStatus.NEW), epic.getId());
+
         manager.createTask(subtask);
         manager.createTask(subtask2);
-        Optional<Task> taskById = manager.getTaskById(epic.getId());
-        Epic epicById = (Epic) taskById.orElse(null);
+        Task taskById = manager.getTaskById(epic.getId());
+        Epic epicById = (Epic) taskById;
 
         assertNotNull(epicById, "epic not found");
         assertEquals(TaskStatus.NEW, epicById.getStatus(), "Wrong status");

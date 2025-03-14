@@ -21,12 +21,12 @@ class InMemoryHistoryManagerTest {
     @BeforeEach
     void init() {
         manager = Managers.getDefault();
-        task = new Task("task description", "simple task", 1, TaskStatus.NEW);
+        task = new Task("task description", "simple task", TaskStatus.NEW);
         manager.createTask(task);
 
         String description = "simple task 2";
         String label = "another task";
-        task2 = new Task(description, label, 2, TaskStatus.NEW);
+        task2 = new Task(description, label, TaskStatus.NEW);
         manager.createTask(task2);
     }
 
@@ -39,6 +39,8 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void getHistory_ShouldNotReturnDuplicatesTest() {
+        task2.setId(2);
+
         for (int i = 0; i < MAX_SIZE + 1; i++) {
             manager.getTaskById(1);
         }
@@ -63,9 +65,9 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void removeFromHistory_RemoveFirstTest() {
-        Epic epic = new Epic(task.getDescription(), "epic", 3);
+        Epic epic = new Epic(task.getDescription(), "epic");
         manager.createTask(epic);
-        Subtask subtask = new Subtask(new Task(task.getDescription(), "subtask", 4, TaskStatus.DONE),
+        Subtask subtask = new Subtask(new Task(task.getDescription(), "subtask", TaskStatus.DONE),
                 epic.getId());
         manager.createTask(subtask);
         manager.getTaskById(1);
@@ -89,9 +91,9 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void removeFromHistory_RemoveMiddleTest() {
-        Task task3 = new Task(task.getDescription(), "task3", 3, TaskStatus.NEW);
+        Task task3 = new Task(task.getDescription(), "task3", TaskStatus.NEW);
         manager.createTask(task3);
-        Subtask subtask = new Subtask(new Task(task.getDescription(), "subtask", 4, TaskStatus.DONE),
+        Subtask subtask = new Subtask(new Task(task.getDescription(), "subtask", TaskStatus.DONE),
                 task3.getId());
         manager.createTask(subtask);
         manager.getTaskById(1);
@@ -114,9 +116,9 @@ class InMemoryHistoryManagerTest {
 
     @Test
     void removeFromHistory_RemoveLastTest() {
-        Epic epic = new Epic(task.getDescription(), "epic", 3);
+        Epic epic = new Epic(task.getDescription(), "epic");
         manager.createTask(epic);
-        Subtask subtask = new Subtask(new Task(task.getDescription(), "subtask", 4, TaskStatus.DONE),
+        Subtask subtask = new Subtask(new Task(task.getDescription(), "subtask", TaskStatus.DONE),
                 epic.getId());
         manager.createTask(subtask);
         manager.getTaskById(1);

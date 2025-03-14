@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.model.Task;
 import ru.yandex.model.enums.TaskStatus;
+import ru.yandex.service.Tasks.InMemoryTaskManager;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -38,7 +39,7 @@ class InMemoryTaskManagerTest extends AbstractTaskManagerTest<InMemoryTaskManage
     @Test
     void createTask_ShouldAddToEmptyPriorityList() {
         Instant now = Instant.now();
-        Task firstTask = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS,
+        Task firstTask = new Task(task.getDescription(), task.getLabel(), TaskStatus.IN_PROGRESS,
                 now, Duration.of(20, ChronoUnit.MINUTES));
 
         manager.createTask(firstTask);
@@ -51,10 +52,10 @@ class InMemoryTaskManagerTest extends AbstractTaskManagerTest<InMemoryTaskManage
 
     @Test
     void createTask_HasNoInteractions_ShouldAddTasks() {
-        Task firstTask = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS,
+        Task firstTask = new Task(task.getDescription(), task.getLabel(), TaskStatus.IN_PROGRESS,
                 Instant.now(), Duration.of(20, ChronoUnit.MINUTES));
 
-        Task secondTask = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS,
+        Task secondTask = new Task(task.getDescription(), task.getLabel(), TaskStatus.IN_PROGRESS,
                 Instant.now().plus(21, ChronoUnit.MINUTES), Duration.of(20, ChronoUnit.MINUTES));
         manager.createTask(firstTask);
         manager.createTask(secondTask);
@@ -66,10 +67,10 @@ class InMemoryTaskManagerTest extends AbstractTaskManagerTest<InMemoryTaskManage
     @Test
     void createTask_HasBoundaryInteractions_ShouldAddTask() {
         Instant now = Instant.now();
-        Task firstTask = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS,
+        Task firstTask = new Task(task.getDescription(), task.getLabel(), TaskStatus.IN_PROGRESS,
                 now, Duration.of(20, ChronoUnit.MINUTES));
 
-        Task secondTask = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS,
+        Task secondTask = new Task(task.getDescription(), task.getLabel(), TaskStatus.IN_PROGRESS,
                 now.plus(20, ChronoUnit.MINUTES), Duration.of(20, ChronoUnit.MINUTES));
         manager.createTask(firstTask);
         manager.createTask(secondTask);
@@ -81,10 +82,10 @@ class InMemoryTaskManagerTest extends AbstractTaskManagerTest<InMemoryTaskManage
     @Test
     void createTask_HasInteractions_ShouldNotAddTask() {
         Instant now = Instant.now();
-        Task firstTask = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS,
+        Task firstTask = new Task(task.getDescription(), task.getLabel(), TaskStatus.IN_PROGRESS,
                 now, Duration.of(20, ChronoUnit.MINUTES));
 
-        Task secondTask = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS,
+        Task secondTask = new Task(task.getDescription(), task.getLabel(), TaskStatus.IN_PROGRESS,
                 now.plus(17, ChronoUnit.MINUTES), Duration.of(20, ChronoUnit.MINUTES));
         manager.createTask(firstTask);
         manager.createTask(secondTask);

@@ -18,17 +18,17 @@ class SubtaskTest {
 
     @Test
     void testEqualsTest() {
-        Task taskEpic = new Task("epic desc", "epic label", 1, TaskStatus.NEW);
+        Task taskEpic = new Task("epic desc", "epic label", TaskStatus.NEW);
         Epic epic = new Epic(taskEpic);
         taskManager.createTask(epic);
 
         String description = "test description";
         String label = "simple task";
-        Task simpleTask = new Task(description, label, 2, TaskStatus.NEW);
+        Task simpleTask = new Task(description, label, TaskStatus.NEW);
         Subtask Subtask = new Subtask(simpleTask, epic.getId());
 
         taskManager.createTask(Subtask);
-        Task taskById = taskManager.getTaskById(2).get();
+        Task taskById = taskManager.getTaskById(2);
 
         assertEquals(2, taskById.getId(), "ids aren't equal in Subtasks");
         assertEquals(Subtask, taskById, "Subtask's aren't equal");

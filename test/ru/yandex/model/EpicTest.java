@@ -7,8 +7,7 @@ import ru.yandex.model.enums.TaskStatus;
 import ru.yandex.model.interfaces.ITaskManager;
 import ru.yandex.service.Managers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class EpicTest {
@@ -22,16 +21,16 @@ class EpicTest {
 
         String description = "test description";
         String label = "simple task";
-        task = new Task(description, label, 1, TaskStatus.NEW);
+        task = new Task(description, label, TaskStatus.NEW);
         epic = new Epic(task);
         taskManager.createTask(epic);
     }
 
     @Test
     void testEqualsTest() {
-        Task taskById = taskManager.getTaskById(1).get();
+        Task taskById = taskManager.getTaskById(1);
 
-        assertEquals(1, taskById.getId(), "ids aren't equal in Epics");
+        assertNotNull(taskById, "ids aren't equal in Epics");
         assertEquals(epic, taskById, "Epics aren't equal");
     }
 
