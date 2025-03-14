@@ -26,4 +26,19 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
         } else
             sendText(exchange, "Method Not Allowed", 405);
     }
+
+    @Override
+    public void processPost(String path, HttpExchange exchange) throws IOException {
+        sendText(exchange, "Method Not Allowed", 405);
+    }
+
+    @Override
+    public void processGet(String path, HttpExchange exchange) throws IOException {
+        sendText(exchange, "Method Not Allowed", 405);
+    }
+
+    @Override
+    public void processDelete(String path, HttpExchange exchange) throws IOException {
+        sendText(exchange, "Method Not Allowed", 405);
+    }
 }

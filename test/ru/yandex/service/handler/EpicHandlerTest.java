@@ -128,7 +128,7 @@ class EpicHandlerTest {
     }
 
     @Test
-    void removeEpic_ShouldRemoveTaskTest() throws IOException, InterruptedException {
+    void removeEpic_ShouldProcessDeleteTest() throws IOException, InterruptedException {
         httpClient = HttpClient.newHttpClient();
         Task task = new Epic(new Task("simple desc", "just task", TaskStatus.NEW));
         taskManager.createTask(task);
@@ -163,7 +163,7 @@ class EpicHandlerTest {
     }
 
     @Test
-    void postTask_UpdateTaskWithExistsId_ShouldUpdateTaskTest() throws IOException, InterruptedException {
+    void processPostTest() throws IOException, InterruptedException {
         Task task = new Epic(new Task("simple desc", "just task", TaskStatus.NEW));
         taskManager.createTask(task);
         Task editedTask = new Epic(new Task(task.getLabel(), "the same but secret task", TaskStatus.IN_PROGRESS));
