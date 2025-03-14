@@ -3,12 +3,16 @@ package ru.yandex.service.handler;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import ru.yandex.exception.task.TaskHasInteractionsException;
+import ru.yandex.model.Adapter.DurationAdapter;
+import ru.yandex.model.Adapter.InstantAdapter;
 import ru.yandex.model.Task;
 import ru.yandex.model.enums.TaskType;
 import ru.yandex.model.interfaces.ITaskManager;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 
 public class BaseHttpHandler {
 
@@ -48,5 +52,13 @@ public class BaseHttpHandler {
             return true;
         }
         throw new TaskHasInteractionsException("Task class mismatch!");
+    }
+
+    public static Gson getJsonMapper() {
+        return new Gson().newBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(Duration.class, new DurationAdapter())
+                .registerTypeAdapter(Instant.class, new InstantAdapter())
+                .create();
     }
 }

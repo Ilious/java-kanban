@@ -5,8 +5,6 @@ import com.google.gson.reflect.TypeToken;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.model.Adapter.DurationAdapter;
-import ru.yandex.model.Adapter.InstantAdapter;
 import ru.yandex.model.Task;
 import ru.yandex.model.enums.TaskStatus;
 import ru.yandex.model.interfaces.ITaskManager;
@@ -34,11 +32,7 @@ class TaskHandlerTest {
 
     private final int PORT = 8080;
 
-    private final Gson gson = new Gson().newBuilder()
-            .setPrettyPrinting()
-            .registerTypeAdapter(Duration.class, new DurationAdapter())
-            .registerTypeAdapter(Instant.class, new InstantAdapter())
-            .create();
+    private final Gson gson = BaseHttpHandler.getJsonMapper();
 
     private HttpClient httpClient;
 

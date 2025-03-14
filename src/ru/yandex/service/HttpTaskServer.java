@@ -3,8 +3,6 @@ package ru.yandex.service;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
 import ru.yandex.exception.HttpConnectionException;
-import ru.yandex.model.Adapter.DurationAdapter;
-import ru.yandex.model.Adapter.InstantAdapter;
 import ru.yandex.model.Task;
 import ru.yandex.model.enums.TaskStatus;
 import ru.yandex.model.interfaces.ITaskManager;
@@ -13,8 +11,6 @@ import ru.yandex.service.handler.*;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.time.Duration;
-import java.time.Instant;
 
 public class HttpTaskServer {
 
@@ -63,11 +59,7 @@ public class HttpTaskServer {
     }
 
     public static void configureGson() {
-        HttpTaskServer.gson = new Gson().newBuilder()
-                .setPrettyPrinting()
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .registerTypeAdapter(Instant.class, new InstantAdapter())
-                .create();
+        HttpTaskServer.gson = BaseHttpHandler.getJsonMapper();
     }
 
     public static void startServer() {
