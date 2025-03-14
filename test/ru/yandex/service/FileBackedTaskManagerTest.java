@@ -7,6 +7,7 @@ import ru.yandex.model.Epic;
 import ru.yandex.model.Subtask;
 import ru.yandex.model.Task;
 import ru.yandex.model.enums.TaskStatus;
+import ru.yandex.service.Tasks.FileBackedTaskManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +29,7 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
     void setUp() throws IOException {
         file = File.createTempFile("Data", ".csv");
         manager = getManager();
-        task = new Task("simple task for test", "simple task", 1, TaskStatus.NEW);
+        task = new Task("simple task for test", "simple task", TaskStatus.NEW);
     }
 
     @Test
@@ -41,13 +42,13 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
     @Test
     void updateTask() {
         String updatedDescription = task.getDescription() + "updated";
-        Task updatedTask = new Task(updatedDescription, task.getLabel(), task.getId(), task.getStatus());
+        Task updatedTask = new Task(updatedDescription, task.getLabel(), task.getStatus());
 
         manager.createTask(task);
-        manager.updateTask(updatedTask);
+        manager.updateTask(updatedTask, 1);
 
         Assertions.assertNotNull(manager.getTaskById(task.getId()));
-        Assertions.assertEquals(updatedDescription, manager.getTaskById(1).get().getDescription());
+        Assertions.assertEquals(updatedDescription, manager.getTaskById(1).getDescription());
         Assertions.assertEquals(1, manager.getListTasks().size());
     }
 
@@ -84,11 +85,10 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
     @Test
     void deleteSubtasks() {
         Epic epic = new Epic(task);
-        int subtaskId = task.getId() + 1;
-        Subtask subtask = new Subtask(new Task(task.getDescription(), task.getLabel(), subtaskId,
-                task.getStatus()), epic.getId());
+        Subtask subtask = new Subtask(new Task(task.getDescription(), task.getLabel(), task.getStatus()), epic.getId());
         manager.createTask(epic);
         manager.createTask(subtask);
+        int subtaskId = subtask.getId();
 
         Task removeById = manager.removeById(subtaskId);
 
@@ -99,11 +99,12 @@ class FileBackedTaskManagerTest extends AbstractTaskManagerTest<FileBackedTaskMa
 
     @Test
     void deleteEpics() {
-        manager.createTask(new Epic(task));
+        Epic epic1 = new Epic(task);
+        manager.createTask(epic1);
 
-        Task removeById = manager.removeById(task.getId());
+        Task removedById = manager.removeById(epic1.getId());
 
-        Assertions.assertEquals(removeById.getId(), task.getId());
+        Assertions.assertEquals(removedById.getId(), epic1.getId());
         Assertions.assertEquals(0, manager.getListEpics().size());
     }
 }

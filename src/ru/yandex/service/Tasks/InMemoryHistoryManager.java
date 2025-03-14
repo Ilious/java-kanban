@@ -1,4 +1,4 @@
-package ru.yandex.service;
+package ru.yandex.service.Tasks;
 
 import ru.yandex.model.Task;
 import ru.yandex.model.interfaces.ITaskHistory;

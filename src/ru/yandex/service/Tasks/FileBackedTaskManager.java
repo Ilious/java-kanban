@@ -1,4 +1,4 @@
-package ru.yandex.service;
+package ru.yandex.service.Tasks;
 
 import ru.yandex.exception.FileException;
 import ru.yandex.model.Epic;
@@ -7,6 +7,7 @@ import ru.yandex.model.Task;
 import ru.yandex.model.enums.TaskStatus;
 import ru.yandex.model.enums.TaskType;
 import ru.yandex.model.interfaces.ITaskHistory;
+import ru.yandex.service.Managers;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -40,8 +41,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Task updateTask(Task task) {
-        Task updateTask = super.updateTask(task);
+    public Task updateTask(Task task, int id) {
+        Task updateTask = super.updateTask(task, id);
         save();
         return updateTask;
     }
@@ -127,14 +128,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         final Instant parsedInstance = data[5].equals("null") ? null : Instant.parse(data[5]);
         final Duration parsedDuration = data[6].equals("null") ? null : Duration.parse(data[6]);
         switch (data[1]) {
-            case "TASK" -> task = new Task(data[4], data[2], Integer.parseInt(data[0]), status,
+            case "TASK" -> task = new Task(data[4], data[2], status,
                     parsedInstance, parsedDuration);
-            case "EPIC" -> task = new Epic(new Task(data[4], data[2], Integer.parseInt(data[0]), status,
+            case "EPIC" -> task = new Epic(new Task(data[4], data[2], status,
                     parsedInstance, parsedDuration));
             case "SUBTASK" -> task = new Subtask(
-                    new Task(data[4], data[2], Integer.parseInt(data[0]), status,
+                    new Task(data[4], data[2], status,
                             parsedInstance, parsedDuration), Integer.parseInt(data[7]));
         }
+        if (task != null)
+            task.setId(Integer.parseInt(data[0]));
 
         return task;
     }
