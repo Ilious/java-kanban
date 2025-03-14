@@ -71,7 +71,8 @@ class SubtasksHandlerTest {
         Task task2 = new Subtask(new Task("simple desc2", "just task", TaskStatus.NEW), epic.getId());
         taskManager.createTask(task);
         taskManager.createTask(task2);
-        String jsonTask = gson.toJson(taskManager.getListSubTasks(), new TypeToken<List<Subtask>>() {}.getType());
+        String jsonTask = gson.toJson(taskManager.getListSubTasks(), new TypeToken<List<Subtask>>() {
+        }.getType());
 
         URI uri = URI.create(String.format("%s:%d%s", URL, PORT, "/subtasks"));
         HttpRequest request = HttpRequest.newBuilder()

@@ -61,7 +61,8 @@ class TaskHandlerTest {
         httpClient = HttpClient.newHttpClient();
         Task task = new Task("simple desc", "just task", TaskStatus.NEW);
         taskManager.createTask(task);
-        String jsonTask = gson.toJson(taskManager.getListTasks(), new TypeToken<List<Task>>() {}.getType());
+        String jsonTask = gson.toJson(taskManager.getListTasks(), new TypeToken<List<Task>>() {
+        }.getType());
 
         URI uri = URI.create(String.format("%s:%d%s", URL, PORT, "/tasks"));
         HttpRequest request = HttpRequest.newBuilder()

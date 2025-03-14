@@ -102,9 +102,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private static void putTaskInList(FileBackedTaskManager taskManager, Task task) {
         int idx = taskManager.idx;
         if (task.getType() == TaskType.EPIC) {
-            taskManager.listEpics.put(taskManager.idx, (Epic)task);
+            taskManager.listEpics.put(taskManager.idx, (Epic) task);
         } else if (task.getType() == TaskType.SUBTASK) {
-            taskManager.listSubTasks.put(taskManager.idx, (Subtask)task);
+            taskManager.listSubTasks.put(taskManager.idx, (Subtask) task);
         } else {
             taskManager.listTasks.put(taskManager.idx, task);
         }

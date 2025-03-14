@@ -36,7 +36,8 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
                     if (urlParts.length == 2) {
                         List<Subtask> allTasks = taskManager.getListSubTasks();
 
-                        String json = jsonMapper.toJson(allTasks, new TypeToken<List<Subtask>>(){}.getType());
+                        String json = jsonMapper.toJson(allTasks, new TypeToken<List<Subtask>>() {
+                        }.getType());
                         sendText(exchange, json, 200);
                         return;
                     }

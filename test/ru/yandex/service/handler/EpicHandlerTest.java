@@ -62,7 +62,8 @@ class EpicHandlerTest {
         httpClient = HttpClient.newHttpClient();
         Epic task = new Epic(new Task("simple desc", "just task", TaskStatus.NEW));
         taskManager.createTask(task);
-        String jsonTask = gson.toJson(taskManager.getListEpics(), new TypeToken<List<Epic>>() {}.getType());
+        String jsonTask = gson.toJson(taskManager.getListEpics(), new TypeToken<List<Epic>>() {
+        }.getType());
 
         URI uri = URI.create(String.format("%s:%d%s", URL, PORT, "/epics"));
         HttpRequest request = HttpRequest.newBuilder()
@@ -104,8 +105,9 @@ class EpicHandlerTest {
         taskManager.createTask(subtask);
         taskManager.createTask(subtask2);
 
-        Epic taskById = ((Epic)taskManager.getTaskById(1));
-        String jsonTask = gson.toJson(taskById.getSubtasks(), new TypeToken<List<Subtask>>() {}.getType());
+        Epic taskById = ((Epic) taskManager.getTaskById(1));
+        String jsonTask = gson.toJson(taskById.getSubtasks(), new TypeToken<List<Subtask>>() {
+        }.getType());
 
         URI uri = URI.create(String.format("%s:%d%s/%d/%s", URL, PORT, "/epics", 1, "subtasks"));
         HttpRequest request = HttpRequest.newBuilder()

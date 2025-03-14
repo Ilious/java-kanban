@@ -91,7 +91,7 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
         Task taskById = manager.getTaskById(1);
 
         assertNotNull(taskById, "taskById should not be null");
-        assertSame(Task.class, taskById.getClass(),"getTask didn't work for Task");
+        assertSame(Task.class, taskById.getClass(), "getTask didn't work for Task");
     }
 
     @Test
@@ -101,7 +101,7 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
         Task taskById = manager.getTaskById(1);
 
         assertNotNull(taskById, "taskById should not be null");
-        assertSame(Subtask.class, taskById.getClass(),"getTask didn't work for Subtask");
+        assertSame(Subtask.class, taskById.getClass(), "getTask didn't work for Subtask");
     }
 
     @Test
@@ -111,7 +111,7 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
         Task taskById = manager.getTaskById(1);
 
         assertNotNull(taskById, "taskById should not be null");
-        assertSame(Epic.class, taskById.getClass(),"getTask didn't work for Epic");
+        assertSame(Epic.class, taskById.getClass(), "getTask didn't work for Epic");
     }
 
     @Test
@@ -119,7 +119,7 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
         manager.createTask(task);
         manager.removeById(1);
 
-        assertEquals(0, manager.getListTasks().size(),"removeById didn't work for Task");
+        assertEquals(0, manager.getListTasks().size(), "removeById didn't work for Task");
     }
 
     @Test
@@ -127,7 +127,7 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
         manager.createTask(subtask);
         manager.removeById(1);
 
-        assertEquals(0, manager.getListSubTasks().size(),"removeById didn't work for Subtask");
+        assertEquals(0, manager.getListSubTasks().size(), "removeById didn't work for Subtask");
     }
 
     @Test
@@ -135,7 +135,7 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
         manager.createTask(epic);
         manager.removeById(1);
 
-        assertEquals(0, manager.getListEpics().size(),"removeById didn't work for Epic");
+        assertEquals(0, manager.getListEpics().size(), "removeById didn't work for Epic");
     }
 
     @Test
@@ -188,7 +188,7 @@ public abstract class AbstractTaskManagerTest<T extends ITaskManager> {
         Task taskById = manager.getTaskById(task.getId());
 
         assertNotNull(taskById, "updateTask didn't work for Task");
-        assertEquals(TaskStatus.IN_PROGRESS, taskById.getStatus(),"updateTask didn't work for Task");
+        assertEquals(TaskStatus.IN_PROGRESS, taskById.getStatus(), "updateTask didn't work for Task");
     }
 
     @Test

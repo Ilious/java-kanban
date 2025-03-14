@@ -37,7 +37,8 @@ public class EpicHandler extends TaskHandler implements HttpHandler {
                     if (urlParts.length == 2) {
                         List<Epic> allTasks = taskManager.getListEpics();
 
-                        String json = jsonMapper.toJson(allTasks, new TypeToken<List<Epic>>() {}.getType());
+                        String json = jsonMapper.toJson(allTasks, new TypeToken<List<Epic>>() {
+                        }.getType());
                         sendText(exchange, json, 200);
                     }
 
@@ -63,7 +64,8 @@ public class EpicHandler extends TaskHandler implements HttpHandler {
                         if (super.checkTaskClassMatch(task, TaskType.EPIC)) {
                             Epic epic = (Epic) task;
                             String json = jsonMapper.toJson(epic.getSubtasks(),
-                                    new TypeToken<List<Subtask>>() {}.getType());
+                                    new TypeToken<List<Subtask>>() {
+                                    }.getType());
                             sendText(exchange, json, 200);
                             return;
                         }
@@ -73,19 +75,19 @@ public class EpicHandler extends TaskHandler implements HttpHandler {
                 case "POST":
                     String request = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
                     if (urlParts.length == 2) {
-                            Epic task = jsonMapper.fromJson(request, Epic.class);
-                            taskManager.createTask(task);
+                        Epic task = jsonMapper.fromJson(request, Epic.class);
+                        taskManager.createTask(task);
 
-                            String json = jsonMapper.toJson(task);
-                            sendText(exchange, json, 201);
+                        String json = jsonMapper.toJson(task);
+                        sendText(exchange, json, 201);
                     }
 
                     if (urlParts.length == 3) {
-                            Epic task = jsonMapper.fromJson(request, Epic.class);
-                            taskManager.updateTask(task, Integer.parseInt(urlParts[2]));
+                        Epic task = jsonMapper.fromJson(request, Epic.class);
+                        taskManager.updateTask(task, Integer.parseInt(urlParts[2]));
 
-                            String json = jsonMapper.toJson(task);
-                            sendText(exchange, json, 201);
+                        String json = jsonMapper.toJson(task);
+                        sendText(exchange, json, 201);
                     }
 
                     break;

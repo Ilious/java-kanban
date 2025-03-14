@@ -42,7 +42,7 @@ public class Epic extends Task {
 
     @Override
     public Instant getEndTime() {
-        return  isNotValidate() ? null : subtasks.stream()
+        return isNotValidate() ? null : subtasks.stream()
                 .map(Subtask::getEndTime)
                 .filter(Objects::nonNull)
                 .max(Comparator.comparing(Instant::getEpochSecond))
@@ -51,7 +51,7 @@ public class Epic extends Task {
 
     @Override
     public Instant getStartTime() {
-        return  isNotValidate() ? null : subtasks.stream()
+        return isNotValidate() ? null : subtasks.stream()
                 .map(Subtask::getStartTime)
                 .filter(Objects::nonNull)
                 .min(Comparator.comparing(Instant::getEpochSecond))

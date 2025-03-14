@@ -119,7 +119,7 @@ public class InMemoryTaskManager implements ITaskManager {
     }
 
     @Override
-    public Task getTaskById(Integer id) throws NotFoundException{
+    public Task getTaskById(Integer id) throws NotFoundException {
         Task task = null;
         if (listTasks.containsKey(id)) task = listTasks.get(id);
         else if (listEpics.containsKey(id)) task = listEpics.get(id);
@@ -184,15 +184,14 @@ public class InMemoryTaskManager implements ITaskManager {
             Epic epic = new Epic(newTask);
             listEpics.put(this.getIdx(), epic);
             epic.setId(this.getIdx());
-        }
-        else if (task.getType() == TaskType.SUBTASK) {
+        } else if (task.getType() == TaskType.SUBTASK) {
             Subtask subtask = new Subtask(newTask, ((Subtask) task).getEpicId());
             subtask.setId(this.getIdx());
 
             listSubTasks.put((this.getIdx()), subtask);
 
             Optional<Epic> epic = getListEpics().stream()
-                    .filter(i -> i.getId() == ((Subtask)task).getEpicId())
+                    .filter(i -> i.getId() == ((Subtask) task).getEpicId())
                     .findFirst();
 
             if (epic.isPresent()) {
@@ -228,13 +227,12 @@ public class InMemoryTaskManager implements ITaskManager {
 
             Epic epic = new Epic(updatedTask);
             listEpics.put(task.getId(), epic);
-        }
-        else if (task.getType() == TaskType.SUBTASK) {
+        } else if (task.getType() == TaskType.SUBTASK) {
             updatedTask = new Subtask(task, ((Subtask) task).getEpicId());
             updatedTask.setId(id);
 
             Subtask subtask = (Subtask) updatedTask;
-            subtask.setEpicId(((Subtask)task).getEpicId());
+            subtask.setEpicId(((Subtask) task).getEpicId());
 
             listSubTasks.put(task.getId(), subtask);
 

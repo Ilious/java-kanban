@@ -35,7 +35,8 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
                     if (urlParts.length == 2) {
                         List<Task> allTasks = taskManager.getListTasks();
 
-                        String json = jsonMapper.toJson(allTasks, new TypeToken<List<Task>>(){}.getType());
+                        String json = jsonMapper.toJson(allTasks, new TypeToken<List<Task>>() {
+                        }.getType());
                         sendText(exchange, json, 200);
                         return;
                     }
