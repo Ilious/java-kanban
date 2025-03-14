@@ -109,8 +109,7 @@ public class EpicHandler extends TaskHandler implements HttpHandler {
             sendText(exchange, "Task not found", 404);
         } catch (TaskHasInteractionsException e) {
             sendText(exchange, "Task not found", 406);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             sendText(exchange, "Internal Server error", 500);
         } finally {
             exchange.close();
