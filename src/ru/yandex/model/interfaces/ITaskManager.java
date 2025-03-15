@@ -5,16 +5,15 @@ import ru.yandex.model.Subtask;
 import ru.yandex.model.Task;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ITaskManager {
-    Optional<Task> getTaskById(Integer id);
+    Task getTaskById(Integer id);
 
     Task removeById(Integer id);
 
     Task createTask(Task task);
 
-    Task updateTask(Task task);
+    Task updateTask(Task task, int id);
 
     List<Subtask> getListSubTasks();
 
@@ -33,4 +32,6 @@ public interface ITaskManager {
     void deleteEpics();
 
     List<Task> getPrioritizedTasks();
+
+    boolean hasInteractions(Task task);
 }
