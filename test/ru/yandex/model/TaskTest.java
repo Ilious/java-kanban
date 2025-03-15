@@ -24,7 +24,7 @@ class TaskTest {
         Task task = new Task(description, label, 1, TaskStatus.NEW);
 
         taskManager.createTask(task);
-        Task taskById = taskManager.getTaskById(1);
+        Task taskById = taskManager.getTaskById(1).get();
 
         assertEquals(1, taskById.getId());
         assertEquals(task, taskById);

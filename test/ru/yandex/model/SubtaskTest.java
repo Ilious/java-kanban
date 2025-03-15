@@ -28,7 +28,7 @@ class SubtaskTest {
         Subtask Subtask = new Subtask(simpleTask, epic.getId());
 
         taskManager.createTask(Subtask);
-        Task taskById = taskManager.getTaskById(2);
+        Task taskById = taskManager.getTaskById(2).get();
 
         assertEquals(2, taskById.getId(), "ids aren't equal in Subtasks");
         assertEquals(Subtask, taskById, "Subtask's aren't equal");

@@ -10,6 +10,8 @@ import ru.yandex.model.interfaces.ITaskHistory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +24,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public FileBackedTaskManager(ITaskHistory historyManager) {
         super(historyManager);
-        this.file = new File(pathToFile + File.pathSeparator + nameOfFile);
+        this.file = new File(pathToFile + File.separatorChar + nameOfFile);
     }
 
     public FileBackedTaskManager(File file, ITaskHistory historyManager) {
@@ -69,7 +71,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
-    public static FileBackedTaskManager fileUpload(File file) {
+    public static FileBackedTaskManager fileUpload(File file) throws FileException {
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(Managers.getDefaultHistory());
         List<String> lines = new ArrayList<>();
 
@@ -84,13 +86,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             throw new FileException("Error occurred in reading file", exception);
         }
 
-        for (String line : lines) {
-            Task task = getTaskFromCsv(line);
-            if (task == null)
+        lines.forEach(line -> {
+            Task taskFromCsv = getTaskFromCsv(line);
+            if (taskFromCsv == null) {
                 throw new FileException("Error parsing file");
+            }
 
-            putTaskInList(fileBackedTaskManager, task);
-        }
+            putTaskInList(fileBackedTaskManager, taskFromCsv);
+        });
 
         return fileBackedTaskManager;
     }
@@ -113,23 +116,30 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String[] data = line.split(",");
 
         TaskStatus status;
+
+
         switch (data[3]) {
             case "IN_PROGRESS" -> status = TaskStatus.IN_PROGRESS;
             case "DONE" -> status = TaskStatus.DONE;
             default -> status = TaskStatus.NEW;
         }
 
+        final Instant parsedInstance = data[5].equals("null") ? null : Instant.parse(data[5]);
+        final Duration parsedDuration = data[6].equals("null") ? null : Duration.parse(data[6]);
         switch (data[1]) {
-            case "TASK" -> task = new Task(data[4], data[2], Integer.parseInt(data[0]), status);
-            case "EPIC" -> task = new Epic(new Task(data[4], data[2], Integer.parseInt(data[0]), status));
+            case "TASK" -> task = new Task(data[4], data[2], Integer.parseInt(data[0]), status,
+                    parsedInstance, parsedDuration);
+            case "EPIC" -> task = new Epic(new Task(data[4], data[2], Integer.parseInt(data[0]), status,
+                    parsedInstance, parsedDuration));
             case "SUBTASK" -> task = new Subtask(
-                    new Task(data[4], data[2], Integer.parseInt(data[0]), status), Integer.parseInt(data[5]));
+                    new Task(data[4], data[2], Integer.parseInt(data[0]), status,
+                            parsedInstance, parsedDuration), Integer.parseInt(data[7]));
         }
 
         return task;
     }
 
-    private void save() {
+    private void save() throws FileException {
         List<Task> allTasks = super.getListAllTasks();
 
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
@@ -144,14 +154,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private String convertToCsvFormat(Task task) {
-        String epicId = task instanceof Subtask ? "" + ((Subtask) task).getEpicId() : "";
+        String epicId = task.getType() == TaskType.SUBTASK ? "" + ((Subtask) task).getEpicId() : "";
+
+        String startTime = task.getStartTime() != null ? task.getStartTime().toString() : "null";
+        String duration = task.getDuration() != null ? task.getDuration().toString() : "null";
 
         List<String> fields = new ArrayList<>(Arrays.asList(
                 String.valueOf(task.getId()),
                 task.getClass().getSimpleName().toUpperCase(),
                 task.getLabel(),
                 task.getStatus().toString(),
-                task.getDescription()
+                task.getDescription(),
+                startTime,
+                duration
         ));
 
         if (!epicId.isEmpty())

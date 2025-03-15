@@ -2,140 +2,94 @@ package ru.yandex.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.model.Epic;
-import ru.yandex.model.Subtask;
 import ru.yandex.model.Task;
 import ru.yandex.model.enums.TaskStatus;
-import ru.yandex.model.interfaces.ITaskManager;
 
-import java.util.List;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class InMemoryTaskManagerTest {
+class InMemoryTaskManagerTest extends AbstractTaskManagerTest<InMemoryTaskManager> {
 
-    ITaskManager taskManager;
-    Task task;
-    Epic epic;
-    Subtask subtask;
+
+    @Override
+    InMemoryTaskManager getManager() {
+        return new InMemoryTaskManager(Managers.getDefaultHistory());
+    }
 
     @BeforeEach
     void init() {
-        taskManager = Managers.getDefault();
-
-        task = new Task("simple task description", "default Task", 1, TaskStatus.NEW);
-        epic = new Epic(new Task("simple task description", "default Epic", 2, TaskStatus.NEW));
-        subtask = new Subtask(new Task("simple task description", "default Subtask", 3, TaskStatus.NEW),
-                epic.getId()
-        );
-
-        taskManager.createTask(task);
-        taskManager.createTask(epic);
-        taskManager.createTask(subtask);
-    }
-
-    @Test
-    void getListTasksTest() {
-        assertEquals(1, taskManager.getListTasks().size(), "size of ListTask is not correct");
-    }
-
-    @Test
-    void getListSubTasksTest() {
-        assertEquals(1, taskManager.getListSubTasks().size(), "size of ListSubTasks is not correct");
-    }
-
-    @Test
-    void getListEpicsTest() {
-        assertEquals(1, taskManager.getListEpics().size(), "size of ListEpics is not correct");
-    }
-
-    @Test
-    void deleteTasksTest() {
-        taskManager.deleteTasks();
-        assertEquals(0, taskManager.getListTasks().size(), "deleteTasksTest is not working correct");
-    }
-
-    @Test
-    void deleteSubTasksTest() {
-        String message = "deleteTasksTest is not working correct";
-
-        taskManager.deleteSubtasks();
-        List<Epic> epics = taskManager.getListEpics();
-
-        assertEquals(0, taskManager.getListSubTasks().size(), message + "for ListSubtasks");
-        for (Epic epic :
-                epics) {
-            assertEquals(0, epic.getSubtasks().size(), message + "for ListEpics");
-        }
-    }
-
-    @Test
-    void deleteEpicsTest() {
-        String message = "deleteTasksTest is not working correct";
-
-        taskManager.deleteEpics();
-
-        assertEquals(0, taskManager.getListEpics().size(), message + " for ListEpics");
-        assertEquals(0, taskManager.getListSubTasks().size(), message + " for ListSubtasks");
+        manager = getManager();
     }
 
     @Test
     void getHistoryTest() {
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(2);
+        manager.createTask(task);
+        manager.createTask(epic);
 
-        assertEquals(2, taskManager.getHistory().size(), "getHistory gives wrong size");
+        manager.getTaskById(1);
+        manager.getTaskById(2);
+
+        assertEquals(2, manager.getHistory().size(), "getHistory gives wrong size");
     }
 
     @Test
-    void getTaskByIdTest() {
-        Task taskById = taskManager.getTaskById(1);
-        Task epicById = taskManager.getTaskById(2);
-        Task SubtaskById = taskManager.getTaskById(3);
+    void createTask_ShouldAddToEmptyPriorityList() {
+        Instant now = Instant.now();
+        Task firstTask = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS,
+                now, Duration.of(20, ChronoUnit.MINUTES));
 
-        assertEquals(Task.class, taskById.getClass(),"getTask didn't work for Task");
-        assertEquals(Epic.class, epicById.getClass(),"getTask didn't work for Epic");
-        assertEquals(Subtask.class, SubtaskById.getClass(),"getTask didn't work for Subtask");
+        manager.createTask(firstTask);
+
+        assertEquals(1, manager.getPrioritizedTasks().size(), "size of prioritized ListTask is " +
+                "not correct");
+        assertEquals(manager.getPrioritizedTasks().get(0).getStartTime(), now,
+                "getPrioritizedTasks doesn't work");
     }
 
     @Test
-    void removeByIdTest() {
-        taskManager.removeById(1);
-        taskManager.removeById(3);
-        taskManager.removeById(2);
+    void createTask_HasNoInteractions_ShouldAddTasks() {
+        Task firstTask = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS,
+                Instant.now(), Duration.of(20, ChronoUnit.MINUTES));
 
-        assertEquals(0, taskManager.getListTasks().size(),"removeById didn't work for Task");
-        assertEquals(0, taskManager.getListSubTasks().size(),"removeById didn't work for SubTask");
-        assertEquals(0, taskManager.getListEpics().size(),"removeById didn't work for Epic");
+        Task secondTask = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS,
+                Instant.now().plus(21, ChronoUnit.MINUTES), Duration.of(20, ChronoUnit.MINUTES));
+        manager.createTask(firstTask);
+        manager.createTask(secondTask);
+
+        assertEquals(2, manager.getPrioritizedTasks().size(), "size of prioritized ListTask is " +
+                "not correct");
     }
 
     @Test
-    void createTaskTest() {
-        Task taskById = taskManager.getTaskById(1);
+    void createTask_HasBoundaryInteractions_ShouldAddTask() {
+        Instant now = Instant.now();
+        Task firstTask = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS,
+                now, Duration.of(20, ChronoUnit.MINUTES));
 
-        assertEquals(task.getStatus(), taskById.getStatus());
-        assertEquals(task.getLabel(), taskById.getLabel());
-        assertEquals(task.getDescription(), taskById.getDescription());
+        Task secondTask = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS,
+                now.plus(20, ChronoUnit.MINUTES), Duration.of(20, ChronoUnit.MINUTES));
+        manager.createTask(firstTask);
+        manager.createTask(secondTask);
+
+        assertEquals(2, manager.getPrioritizedTasks().size(), "size of prioritized ListTask is " +
+                "not correct");
     }
 
     @Test
-    void updateTaskTest() {
-        Task taskEdited = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS);
-        Subtask subtaskEdited = new Subtask(
-                new Task(subtask.getDescription(), subtask.getLabel(), subtask.getId(), TaskStatus.DONE),
-                subtask.getEpicId()
-        );
+    void createTask_HasInteractions_ShouldNotAddTask() {
+        Instant now = Instant.now();
+        Task firstTask = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS,
+                now, Duration.of(20, ChronoUnit.MINUTES));
 
-        taskManager.updateTask(taskEdited);
-        taskManager.updateTask(subtaskEdited);
+        Task secondTask = new Task(task.getDescription(), task.getLabel(), task.getId(), TaskStatus.IN_PROGRESS,
+                now.plus(17, ChronoUnit.MINUTES), Duration.of(20, ChronoUnit.MINUTES));
+        manager.createTask(firstTask);
+        manager.createTask(secondTask);
 
-        Task taskById = taskManager.getTaskById(1);
-        Task epicById = taskManager.getTaskById(2);
-        Task subtaskById = taskManager.getTaskById(3);
-
-        assertEquals(TaskStatus.IN_PROGRESS, taskById.getStatus(),"updateTask didn't work for Task");
-        assertEquals(TaskStatus.DONE, epicById.getStatus(), "updateTask didn't work for SubTask");
-        assertEquals(TaskStatus.DONE, subtaskById.getStatus(), "updateTask didn't work for Epic");
-
+        assertEquals(1, manager.getPrioritizedTasks().size(), "size of prioritized ListTask is " +
+                "not correct");
     }
 }

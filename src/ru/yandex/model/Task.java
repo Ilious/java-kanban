@@ -3,6 +3,8 @@ package ru.yandex.model;
 import ru.yandex.model.enums.TaskStatus;
 import ru.yandex.model.enums.TaskType;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -13,11 +15,36 @@ public class Task {
 
     private TaskStatus status;
 
+    private Instant startTime;
+
+    private Duration duration;
+
     public Task(String description, String label, int id, TaskStatus status) {
         this.description = description;
         this.label = label;
         this.id = id;
         this.status = status;
+    }
+
+    public Task(String description, String label, int id, TaskStatus status, Instant startTime, Duration duration) {
+        this.description = description;
+        this.duration = duration;
+        this.id = id;
+        this.label = label;
+        this.startTime = startTime;
+        this.status = status;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public Instant getEndTime() {
+        return startTime != null ? startTime.plus(duration) : null;
+    }
+
+    public Instant getStartTime() {
+        return startTime;
     }
 
     public void updateStatus(TaskStatus status) {

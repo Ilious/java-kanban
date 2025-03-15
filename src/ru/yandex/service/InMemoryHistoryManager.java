@@ -46,22 +46,25 @@ public class InMemoryHistoryManager implements ITaskHistory {
 
         if (last == null) {
             last = current;
-            return;
+        } else {
+            last.next = current;
+            last = current;
         }
 
-        last.next = current;
-        last = last.next;
         history.put(task.getId(), current);
     }
 
     @Override
     public void remove(int id) {
         Node node = history.remove(id);
+
         if (node == null)
             return;
 
         if (node.equals(first)) {
             first = first.next;
+            if (first != null) first.prev = null;
+            return;
         }
 
         if (node.equals(last)) {
